@@ -1,0 +1,132 @@
+:root {
+  --overflow: overlay;
+}
+
+@supports not (overflow: overlay) {
+  :root {
+    --overflow: auto;
+  }
+}
+#app {
+  >div:not(.ivu-layout) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+  }
+  >.ivu-layout {
+    >.ivu-layout {
+      min-height: calc(100vh - 64px);
+    }
+    > .ivu-layout-header {
+      padding-left: 0px;
+      padding-right: 0px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      line-height: inherit;
+      // color: $white;
+      border-bottom: 1px solid $border-color;
+      display: flex;
+      .navbar-brand {
+        min-width: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      >div {
+        padding: 16px 24px;
+        // max-width: 1600px;
+        margin-left: auto;
+        margin-right: auto;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+  }
+
+  .ivu-layout-content {
+    padding: 16px 24px;
+    background-color: $white;
+    border-radius: 0 0 8px 8px;
+  }
+
+  .ivu-layout-sider {
+    border-right: 1px solid $border-color;
+    z-index: 9;
+    .ivu-layout-sider-children {
+      position: sticky;
+      top: 64px;
+      z-index: 9;
+      overflow-y: var(--overflow);
+      max-height: calc(100vh - 64px);
+    }
+    .ivu-page-header {
+      padding: 16px;
+    }
+
+    .ivu-page-header-logo {
+      margin-right: 8px;
+    }
+
+    .ivu-menu-vertical:after {
+      display: none;
+    }
+  }
+}
+.wrapper {
+  width: 100%;
+  // max-width: 1600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.main-layout {
+  background-color: transparent;
+  padding: 16px;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+  .ivu-page-header {
+    position: sticky;
+    padding: 24px 24px 0 24px;
+    top: 80px;
+    z-index: 8;
+    border-radius: 8px 8px 0 0;
+    box-shadow: 0px -20px 0 20px $body-bg;
+    .ivu-page-header-breadcrumb {
+      margin-bottom: 0;
+      position: absolute;
+      top: 8px;
+      right: 24px;
+      .ivu-breadcrumb {
+        font-size: 11px;
+      }
+    }
+    .ivu-page-header-title,
+    .ivu-page-header-action {
+      margin-bottom: 0;
+      line-height: 24px;
+    }
+    .ivu-page-header-back {
+      height: 24px;
+      .ivu-divider {
+        top: 5px
+      }
+    }
+    .ivu-page-header-tabs {
+      margin: 0;
+    }
+    .ivu-page-header-detail {
+      margin-bottom: 8px;
+    }
+  }
+  .ivu-global-footer {
+    margin: 0;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    font-size: 12px;
+  }
+}

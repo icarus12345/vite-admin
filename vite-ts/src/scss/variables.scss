@@ -1,0 +1,304 @@
+@use 'sass:math';
+$breakpoints: (xs: 375px, sm: 567px, md: 768px, lg: 992px, xl: 1200px, xxl: 1440px);
+$grid-breakpoints: ( xs: 0, sm: 576px, md: 768px, lg: 992px, xl: 1200px, xxl: 1440px);
+$container-max-widths: (
+  sm: 100%,
+  md: 100%,
+  lg: 121.6rem,
+  // xl: 132rem,
+  // xxl: 169.6rem
+);
+
+$gray-lighten-1: #F5F5F5;
+$gray-lighten-2: #EEEEEE;
+$gray-lighten-3: #E0E0E0;
+$gray-lighten-4: #BDBDBD;
+$gray: #9E9E9E;
+$gray-darken-1: #757575;
+$gray-darken-2: #616161;
+$gray-darken-3: #424242;
+$gray-darken-4: #212121;
+
+$red-lighten-1: #FFCCBC;
+$red-lighten-2: #FFAB91;
+$red-lighten-3: #FF8A65;
+$red-lighten-4: #FF7043;
+$red: #FF5722;
+$red-darken-1: #F4511E;
+$red-darken-2: #E64A19;
+$red-darken-3: #D84315;
+$red-darken-4: #BF360C;
+
+$orange-lighten-1: #FFE0B2;
+$orange-lighten-2: #FFCC80;
+$orange-lighten-3: #FFB74D;
+$orange-lighten-4: #FFA726;
+$orange: #FF9800;
+$orange-darken-1: #FB8C00;
+$orange-darken-2: #F57C00;
+$orange-darken-3: #EF6C00;
+$orange-darken-4: #E65100;
+
+$yellow-lighten-1: #FFF9C4;
+$yellow-lighten-2: #FFF59D;
+$yellow-lighten-3: #FFF176;
+$yellow-lighten-4: #FFEE58;
+$yellow: #FFEB3B;
+$yellow-darken-1: #FDD835;
+$yellow-darken-2: #FBC02D;
+$yellow-darken-3: #F9A825;
+$yellow-darken-4: #F57F17;
+
+$green-lighten-1: #C8E6C9;
+$green-lighten-2: #A5D6A7;
+$green-lighten-3: #81C784;
+$green-lighten-4: #66BB6A;
+$green: #4CAF50;
+$green-darken-1: #43A047;
+$green-darken-2: #388E3C;
+$green-darken-3: #2E7D32;
+$green-darken-4: #1B5E20;
+
+$blue-lighten-1: #BBDEFB;
+$blue-lighten-2: #90CAF9;
+$blue-lighten-3: #64B5F6;
+$blue-lighten-4: #42A5F5;
+$blue: #2196F3;
+$blue-darken-1: #1E88E5;
+$blue-darken-2: #1976D2;
+$blue-darken-3: #1565C0;
+$blue-darken-4: #0D47A1;
+
+$white:       #FFF;
+$dark:        #000;
+$info:        $blue;
+$link:        $blue;
+$alert:       $yellow;
+$primary:     $blue-darken-2;
+$secondary:   $gray-darken-3;
+$main:        $gray-darken-4;
+$text:        $gray-darken-4;
+$prompt:      $gray;
+$disable-text:$gray;
+$hint-text:   $gray;
+$prompt-text: $gray;
+$success:     $green;
+$warning:     $red;
+$error:       $red;
+$danger:      $red;
+$light:       $white;
+$text-muted:  $gray;
+
+$theme-colors: (
+  "main":    $main,
+  "primary":    $primary,
+  "secondary":  $secondary,
+  "success":    $success,
+  "info":       $info,
+  "warning":    $warning,
+  "danger":     $danger,
+  "light":      $light,
+  "dark":       $dark,
+  "prompt":     $prompt,
+);
+$zindex-dropdown:                   100;
+$zindex-sticky:                     120;
+$zindex-fixed:                      130;
+$zindex-offcanvas-backdrop:         140;
+$zindex-offcanvas:                  145;
+$zindex-modal-backdrop:             150 !important;
+$zindex-modal:                      150;
+$zindex-popover:                    170;
+$zindex-tooltip:                    180;
+
+$font-size-root: 10px;
+$font-size-base: 1.4rem;
+$font-weight-base: 400;
+$line-height-base: 1.25;
+$body-color: $dark;
+$body-bg: $gray-lighten-1;
+$light: $white;
+$enable-cssgrid: true;
+$spacer: 1rem !default;
+$spacers: (
+  0: 0,
+  1: 0.4rem,
+  2: 0.8rem,
+  3: 1.6rem,
+  4: 2.4rem,
+  5: 3.2rem,
+  6: 4rem,
+  2x: 2rem,
+  6x: 6rem,
+  8x: 8rem,
+  10x: 10rem,
+);
+$enable-negative-margins: true;
+$font-family-sans-serif: "Roboto","Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+$grid-gutter-width: 1.6rem;
+// $gutters: $spacers !default;
+// $navbar-link-color: $gray-300;
+$navbar-toggler-padding-x: 0;
+$navbar-toggler-focus-width: 0;
+// $navbar-light-hover-color: $orange-600;
+// $navbar-light-active-color: $orange-600;
+$nav-link-padding-y: 0.8rem;
+$nav-link-padding-x: 1.6rem;
+$nav-link-height: 4rem;
+$navbar-padding-y: 1.6rem;
+$navbar-padding-x: 1.6rem;
+$navbar-brand-padding-x: 0;
+$navbar-brand-padding-y: 0;
+$link-color: currentColor;
+$link-hover-color: currentColor;
+$paragraph-margin-bottom: 0;
+$card-border-radius: 0.6rem;
+$card-inner-border-radius: 0.6rem;
+$card-border-width: 0;
+$card-cap-bg: $white;
+$card-cap-padding-y: 1.6rem;
+$card-cap-padding-x: 1.6rem;
+$card-spacer-y: 1.6rem;
+$card-spacer-x: 1.6rem;
+$card-title-spacer-y: 1.6rem;
+$breadcrumb-item-padding-x: 0;
+$badge-padding-y: 0.4rem;
+$badge-padding-x: 0.8rem;
+$badge-border-radius: 0.4rem;
+// $badge-font-size: 12px;
+$badge-font-weight: 500;
+$hr-margin-y: 2.4rem;
+$hr-color: $gray;
+$hr-opacity: 0.5;
+
+$border-radius-sm: 0.4rem;
+$border-radius: 0.6rem;
+$border-radius-lg: 0.8rem;
+
+$font-sizes: (
+  1: 3.2rem,
+  2: 2.8rem,
+  3: 2.4rem,
+  4: 2.0rem,
+  5: 1.6rem,
+  6: 1.2rem
+);
+$small-font-size: 0.875em;
+$headings-margin-bottom: 0;
+$headings-font-weight: 700;
+$headings-line-height: 1.25;
+$display-font-sizes: (
+  1: 5rem,
+  2: 4.5rem,
+  3: 4rem,
+  4: 3.5rem,
+  5: 3rem,
+  6: 2.625rem,
+);
+
+$aspect-ratios: (
+  "1x1": 100%,
+
+  "2x1": 50%,
+  "1x2": 200%,
+
+  "2x3": calc(3 / 2 * 100%),
+  "3x2": calc(2 / 3 * 100%),
+
+  "4x3": calc(3 / 4 * 100%),
+  "3x4": calc(4 / 3 * 100%),
+
+  "5x4": calc(4 / 5 * 100%),
+  "4x5": calc(5 / 4 * 100%),
+
+  "10x6": calc(6 / 10 * 100%),
+  "6x10": calc(10 / 6 * 100%),
+
+  "16x9": calc(9 / 16 * 100%),
+  "9x16": calc(16 / 9 * 100%),
+
+  "21x9": calc(9 / 21 * 100%),
+  "9x21": calc(21 / 9 * 100%),
+);
+
+/**
+  * owlCarausel
+  */
+// $dot-width: 6px;
+// $dot-height: 6px;
+// $dot-margin: 2px;
+// $dot-rounded: 3px;
+// $nav-margin: 0;
+// $nav-padding: 0;
+// $nav-background: rgba(255,255,255,0.4);
+// $nav-background-hover: rgba(255,255,255,0.6);
+// $dot-background: $gray-600;
+// $dot-background-active: $orange-500;
+$border-color: $gray-lighten-2;
+
+// $alert-border-width: 0;
+// $alert-border-radius: 4px;
+// scss-docs-start alert-variables
+// $alert-padding-y:               12px;
+// $alert-padding-x:               12px;
+// $alert-margin-bottom:           24px;
+// $alert-border-radius:           4px;
+// $alert-link-font-weight:        normal;
+// $alert-border-width:            0;
+// $alert-bg-scale:                -74%;
+// $alert-border-scale:            74% ;
+// $alert-color-scale:             50%;
+// $alert-dismissible-padding-r:   52px; // 3x covers width of x plus default padding on either side
+// scss-docs-end alert-variables
+
+// $offcanvas-padding-y: 1.4rem;
+// $offcanvas-padding-x: 2.4rem;
+
+$link-decoration: none;
+$link-color: inherit;
+$link-hover-color: $primary;
+
+// $modal-dialog-margin: 1.6rem;
+// $modal-inner-padding: 1.6rem;
+// $modal-header-padding-x: 1.6rem;
+// $modal-header-padding-y: 1.6rem;
+// $modal-header-border-width: 0;
+// $modal-footer-border-width: 0;
+// $modal-content-border-width: 0;
+// $modal-footer-margin-between: 0;
+// $modal-backdrop-opacity: 0.9;
+
+// $dropdown-link-active-color: $main;
+// $dropdown-link-active-bg: $gray-100;
+// $dropdown-link-hover-bg: $gray-100;
+
+// $modal-sm: 32rem;
+// $modal-md: 60rem;
+// $modal-lg: 80rem;
+
+// $input-btn-padding-y:               0.8rem;
+// $input-btn-padding-x:               1.6rem;
+// $input-btn-font-size:               1.6rem;
+// $btn-line-height:             $input-btn-line-height !default;
+
+// $input-btn-padding-y-sm:            0.5rem;
+// $input-btn-padding-x-sm:            1.6rem;
+// $input-btn-font-size-sm:            1.4rem;
+
+// $input-btn-padding-y-lg:            1rem;
+// $input-btn-padding-x-lg:            2rem;
+// $input-btn-font-size-lg: 1.8rem;
+// $btn-disabled-opacity: 0.5;
+// $spinner-border-width: 2px;
+
+$utilities: (
+  "cursor": (
+    property: cursor,
+    values: auto default pointer wait text move help not-allowed
+  ),
+  "text-transform-none": (
+    property: text-transform,
+    class: 'text',
+    values: none
+  )
+);
