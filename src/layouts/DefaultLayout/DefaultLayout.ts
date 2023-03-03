@@ -1,10 +1,10 @@
 import { defineComponent } from 'vue'
-import { Token } from '@/utils'
+import { $Token } from '@/utils'
 export default defineComponent({
   name: 'DefaultLayout',
   setup() { },
   data() {
-    console.log(Token)
+    console.log($Token)
     return {
       split: 0.5,
       activeRoute: this.$route.path,

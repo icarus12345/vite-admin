@@ -1,4 +1,4 @@
-class _TokenUtil {
+class TokenUtil {
   constructor() {}
   tokenKey: string = 'vue_admin_template_token'
   get(): string | null {
@@ -11,4 +11,4 @@ class _TokenUtil {
     return localStorage.removeItem(this.tokenKey)
   }
 }
-export const Token = new _TokenUtil()
+export const $Token = new TokenUtil()
