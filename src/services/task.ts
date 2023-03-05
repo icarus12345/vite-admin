@@ -1,25 +1,36 @@
-import Axios, { AxiosObservable } from "axios-observable";
+import { AxiosRequestConfig } from "axios";
+import { AxiosObservable } from "axios-observable";
+import { map, share } from "rxjs";
+import { $Axios } from "./request";
 
 class TaskService {
 
-  indexTask(): AxiosObservable<any> {
-    return Axios.get(`/api/index`);
+  all(params: AxiosRequestConfig): AxiosObservable<any> {
+    return $Axios.get(`https://jsonplaceholder.typicode.com/todos`, {
+      params
+    })
+    .pipe(
+      map((res) => {
+        return res.data
+      }),
+      share()
+    )
   }
 
-  showTask(id: number): AxiosObservable<any> {
-    return Axios.get(`/api/show/${id}`);
+  show(id: number): AxiosObservable<any> {
+    return $Axios.get(`https://jsonplaceholder.typicode.com/todos/${id}`);
   }
 
-  storeTask(data: any): AxiosObservable<any> {
-    return Axios.post(`/api/store`, data);
+  store(data: any): AxiosObservable<any> {
+    return $Axios.post(`https://jsonplaceholder.typicode.com/todos`, data);
   }
 
-  updateTask(id: number, data: any): AxiosObservable<any> {
-    return Axios.put(`/api/update/${id}`, data);
+  update(id: number, data: any): AxiosObservable<any> {
+    return $Axios.put(`https://jsonplaceholder.typicode.com/todos/${id}`, data);
   }
 
-  deleteTask(id: number): AxiosObservable<any> {
-    return Axios.delete(`/api/delete/${id}`);
+  delete(id: number): AxiosObservable<any> {
+    return $Axios.delete(`https://jsonplaceholder.typicode.com/todos/${id}`);
   }
 
 }

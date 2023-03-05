@@ -50,7 +50,6 @@ export default class CustomAxiosInstance {
       async (response: AxiosResponse<any, any>) => {
         console.log('interceptors.response', response)
         const { status, data } = response;
-        return Promise.reject({xxx: 111});
         if (status === HttpStatusCode.Ok || status < HttpStatusCode.MultipleChoices || status === HttpStatusCode.NotModified) {
           return this.handleServiceResult(data);
         }
@@ -159,7 +158,11 @@ export default class CustomAxiosInstance {
     return this.instance.put(url, data, config);
   }
 
-  handleDelete<T>(url: string, config: AxiosRequestConfig) {
+  patch<T>(url: string, data?: any, config?: AxiosRequestConfig) {
+    return this.instance.patch(url, data, config);
+  }
+
+  delete<T>(url: string, config?: AxiosRequestConfig) {
     return this.instance.delete(url, config);
   }
 }

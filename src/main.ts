@@ -5,17 +5,17 @@ import router from './router'
 import store from './store'
 
 // import "bootstrap"
-import './styles/index.less'
 import './scss/index.scss'
-// import registerLayouts from './layouts/register'
-// import './mock'
+import './styles/index.less'
+import { i18n } from './locales/i18n';
+
 
 const app = createApp(App)
-// registerLayouts(app)
 
 app.use(router)
   .use(store)
+  .use(i18n)
   .use(ViewUIPlus, {
-
+    i18n
   })
   .mount('#app')

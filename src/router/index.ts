@@ -1,24 +1,26 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
+import { GuestGuard } from '../guards'
 
 const routes = [
   {
     path: '/',
-    name: 'home',
+    name: 'HOME',
     meta: { layout: 'DefaultLayout' },
     component: () => import('@/views/Home/Home.vue')
   }, {
     path: '/auth',
-    name: 'auth',
+    name: 'AUTH',
+    beforeEnter: GuestGuard,
     component: () => import('@/views/auth/Auth.vue'),
     children: [
       {
         path: 'login',
-        name: 'login',
+        name: 'AUTH.LOGIN',
         component: () => import('@/views/auth/Login/Login.vue')
       },
       {
         path: 'register',
-        name: 'register',
+        name: 'AUTH.REGISTER',
         component: () => import('@/views/auth/Register.vue')
       },
       {
@@ -35,25 +37,25 @@ const routes = [
   },
   {
     path: '/not-found',
-    name: 'notFound',
+    name: 'NOTFOUND',
     meta: { layout: 'DefaultLayout' },
     component: () => import('@/views/errors/NotFound.vue')
   },
   {
     path: '/unauthorized',
-    name: 'unauthorized',
+    name: 'UNAUTHORIZED',
     meta: { layout: 'DefaultLayout' },
     component: () => import('@/views/errors/Unauthorized.vue')
   },
   {
     path: '/forbidden',
-    name: 'forbidden',
+    name: 'FORBIDDEN',
     meta: { layout: 'DefaultLayout' },
     component: () => import('@/views/errors/Forbidden.vue')
   },
   {
     path: '/oops',
-    name: 'oops',
+    name: 'OOPS',
     meta: { layout: 'DefaultLayout' },
     component: () => import('@/views/errors/Oops.vue')
   }
@@ -62,7 +64,7 @@ const routes = [
 const router = createRouter({
   routes,
   linkActiveClass: 'ivu-menu-item-active',
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   scrollBehavior() {
     return { top: 0 }
   }

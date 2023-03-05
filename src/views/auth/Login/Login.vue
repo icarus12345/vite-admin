@@ -1,7 +1,7 @@
 <template>
   <Card :bordered="false" class="v-login">
     <Login @on-submit="handleSubmit">
-      <img class="m-auto d-block" height="60" src="@/assets/images/logo.png"/>
+      <img class="m-auto d-block" height="60" src="@/assets/images/logo.svg"/>
       <Divider orientation="left">LOGIN</Divider>
       <div class="vstack gap-3">
         <UserName name="username" placeholder="User Name"/>

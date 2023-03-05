@@ -1,10 +1,19 @@
 import { defineComponent } from 'vue'
-import { $Token } from '@/utils'
+import QuickSearch from '@/layouts/DefaultLayout/QuickSearch/QuickSearch.vue'
+import Notification from '@/layouts/DefaultLayout/Notification/Notification.vue'
+import AccountMenu from '@/layouts/DefaultLayout/AccountMenu/AccountMenu.vue'
+import LeftNavbar from '@/layouts/DefaultLayout/LeftNavbar/LeftNavbar.vue'
+
 export default defineComponent({
   name: 'DefaultLayout',
+  components: {
+    QuickSearch,
+    Notification,
+    AccountMenu,
+    LeftNavbar
+  },
   setup() { },
   data() {
-    console.log($Token)
     return {
       split: 0.5,
       activeRoute: this.$route.path,

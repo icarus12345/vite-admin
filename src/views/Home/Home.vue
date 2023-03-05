@@ -1,7 +1,7 @@
 <template>
   <router-link to="/">Home</router-link> |
   <router-link to="/auth">Auth</router-link> |
-  <router-link to="/auth/login">Auth/Login</router-link> |
+  <router-link :to="{name: 'AUTH.LOGIN'}">Auth/Login</router-link> |
   <router-link to="/auth/register">Auth/Register</router-link> |
   <router-link to="/auth/forgot-password">Auth/Forgot</router-link> |
   <Row>
@@ -30,11 +30,25 @@
       </NumberInfo>
     </Col>
   </Row>
-  <Demo />
-  <Demo />
-  <Demo />
-  <Demo />
-  <div class="container py-4 px-3 mx-auto">
+  <Button type="primary" @click="show">Show</Button>
+  <Button type="primary" @click="showModal = true">Welcome!</Button>
+  <Modal v-model="showModal" draggable sticky scrollable :mask="false" ok-text="OK" cancel-text="Cancel" width="600">
+    <template #header>
+      <div class="ivu-modal-header-inner">
+        <Icon type="md-arrow-back" size="20"/>
+        <Divider type="verticle"></Divider>
+        <span>Title</span>
+      </div>
+    </template>
+    <TaskList />
+  </Modal>
+  <Image width="200px" height="100px" lazy src="https://file.iviewui.com/images/image-demo-1.jpg" preview/>
+  <Image width="200px" height="100px">
+      <template #error>
+          <Icon type="ios-image-outline" size="24" color="#ccc" />
+      </template>
+  </Image>  
+  <div class="container">
     <h1>Hello, Bootstrap and Vite!</h1>
     <button class="btn btn-primary">Primary button</button>
   </div>
