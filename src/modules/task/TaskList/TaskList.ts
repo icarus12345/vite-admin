@@ -6,6 +6,11 @@ export default {
   name: 'TaskList',
   components: {
   },
+  props: {
+    selectedIds: [String],
+    selectedItems: Array
+  },
+  emits: ['selectionChange'],
   setup() {
     return {
     }
@@ -20,7 +25,6 @@ export default {
         {
           type: 'selection',
           width: 46,
-
           align: 'center',
           fixed: 'left'
         },
@@ -149,30 +153,33 @@ export default {
           this.data = tasks
         })
     },
-    onSortChange(event: any) {
+    sortChange(event: any) {
       console.log(event)
     },
-    onFilterChange(event: any) {
+    filterChange(event: any) {
       console.log(event)
     },
-    handlePageChange(page: number) {
+    pageChange(page: number) {
       this.page = page;
       this.fetch();
     },
-    handlePageSizeChange(size: number) {
+    pageSizeChange(size: number) {
       this.size = size;
       if (this.page === 1) {
         this.fetch();
       }
     },
-    handleContextMenu(row) {
+    contextMenu(row) {
       console.log(row)
     },
-    handleContextMenuEdit() {
+    contextMenuEdit() {
 
     },
-    handleContextMenuDelete() {
+    contextMenuDelete() {
 
+    },
+    selectionChange(event) {
+      this.$emit('selectionChange', event)
     }
   }
 }

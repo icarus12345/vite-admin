@@ -2,8 +2,15 @@
     box-shadow: 2px 0 6px -2px rgb(0 0 0 / 5%);
 }
 .ivu-modal-body {
+    > .ivu-table-quick-filter {
+        margin-bottom: 8px;
+    }
     > .ivu-table-wrapper {
-        margin: -16px -16px 0 -16px;
+        margin-left: -16px;
+        margin-right: -16px;
+        &:first-child {
+            margin-top: -16px;
+        }
         table {
             width: 100% !important;
         }

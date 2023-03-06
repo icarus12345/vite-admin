@@ -32,49 +32,17 @@ export default {
   },
   methods: {
     show() {
-      // const instance = Modal.newInstance({
-      //   closable: false,
-      //   maskClosable: false,
-      //   footerHide: true,
-      //   // render: render,
-      //   lockScroll: true,
-      //   visible: false,
-      //   width: 416,
-      //   title: '',
-      //   body: '',
-      //   iconType: '',
-      //   iconName: '',
-      //   okText: undefined,
-      //   cancelText: undefined,
-      //   showCancel: false,
-      //   loading: false,
-      //   buttonLoading: false,
-      //   scrollable: false,
-      //   closing: false 
-      // });
-      // instance.show({
-      //   onRemove() {
-
-      //   }
-      // })
-      this.$Modal.alert({})
-      // console.log(instance,this.$Modal)
-      
-      // this.$Modal.confirm({
-      //   icon: null,
-      //   title: 'AAA',
-      //   render: (h) => {
-      //       return h( Input, {
-      //           size: "large",
-      //           modelValue: this.value,
-      //           autofocus: true,
-      //           placeholder: 'Please enter your name...',
-      //           'onInput': (event) => {
-      //               this.value = event.target.value;
-      //           }
-      //       })
-      //   }
-      // })
+      console.log(typeof TaskList)
+      this.$Modal.widget({
+        title: 'Task List',
+        component: TaskList,
+        onCancel() {
+          alert('Cancel')
+        },
+        // render(h) {
+        //   return h(TaskList)
+        // }
+      })
     }
   }
 }
