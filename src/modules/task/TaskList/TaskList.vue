@@ -26,7 +26,7 @@
           <div>{{ row.user.email }}</div>
       </template>
       <template #status="{ row }">
-          <Checkbox v-model="row.completed" border></Checkbox>
+          <Checkbox v-model="row.completed" class="pe-none"></Checkbox>
       </template>
     <template #contextMenu>
       <DropdownItem><Icon type="md-add" size="16"/> Add New</DropdownItem>

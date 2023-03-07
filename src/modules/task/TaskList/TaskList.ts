@@ -1,4 +1,4 @@
-import { $TaskService } from '@/services'
+import { $TaskService, $UserService } from '@/services'
 import { catchError, finalize, of } from 'rxjs'
 import { Button, Icon } from 'view-ui-plus';
 
@@ -13,6 +13,7 @@ export default {
   emits: ['selectionChange'],
   setup() {
     return {
+      userFilter: []
     }
   },
   data() {
@@ -66,16 +67,7 @@ export default {
             }
             return a > b ? a : b;
           },
-          filters: [
-            {
-              label: 'Greater than 25',
-              value: 1
-            },
-            {
-              label: 'Less than 25',
-              value: 2
-            }
-          ],
+          filters: [],
           // filterMultiple: false,
           // filteredValue: [2],
           // filterMethod (value, row) {
@@ -136,6 +128,16 @@ export default {
   },
   created() {
     this.fetch()
+    $UserService
+      .all()
+      .subscribe((users) => {
+        this.columns[2].filters = users.map(u => {
+          return {
+            label: u.name,
+            value: u.id
+          }
+        })
+      })
   },
   methods: {
     fetch() {
