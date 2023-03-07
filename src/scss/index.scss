@@ -3,6 +3,8 @@
 
 @import 'reboot';
 @import 'core';
-@import 'ivue/input';
-@import 'ivue/badge';
-@import 'ivue/layout';
+body {
+  @import 'ivue/input';
+  @import 'ivue/badge';
+  @import 'ivue/layout';
+}
