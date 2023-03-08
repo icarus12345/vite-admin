@@ -1,10 +1,12 @@
 import { $TaskService, $UserService } from '@/services'
 import { catchError, finalize, of } from 'rxjs'
-import { Button, Icon } from 'view-ui-plus';
+import { Button, Icon } from 'view-ui-plus'
+import VTable from '@/components/table/Table/Table.vue'
 
 export default {
   name: 'TaskList',
   components: {
+    VTable
   },
   props: {
     selectedIds: [String],
@@ -38,20 +40,7 @@ export default {
           sortType: 'desc',
           resizable: true,
           minWidth: 100,
-          filters: [
-            {
-              label: 'New York',
-              value: 'New York'
-            },
-            {
-              label: 'London',
-              value: 'London'
-            },
-            {
-              label: 'Sydney',
-              value: 'Sydney1111'
-            }
-          ],
+          filters: 'text',
           filterMethod(value, row) {
             return row.address.indexOf(value) > -1;
           }

@@ -6,7 +6,7 @@
       </template>
     </Input>
   </div>
-  <Table ref="selection" 
+  <VTable ref="selection" 
     :columns="columns" 
     :data="data" 
     :loading="loading"
@@ -22,8 +22,8 @@
           <div v-line-clamp="2">{{ row.title }}</div>
       </template>
       <template #user="{ row }">
-          <strong>{{ row.user.name }}</strong>
-          <div>{{ row.user.email }}</div>
+          <div>{{ row.user.name }}</div>
+          <small>{{ row.user.email }}</small>
       </template>
       <template #status="{ row }">
           <Checkbox v-model="row.completed" class="pe-none"></Checkbox>
@@ -47,7 +47,7 @@
         </template>
       </Dropdown>
     </template>
-  </Table>
+  </VTable>
 
   <Page :total="400" size="small" show-sizer show-total class="ivu-table-page" @on-change="pageChange" @on-page-size-change="pageSizeChange"/>
 </template>
