@@ -1,16 +1,16 @@
-import { CheckboxGroup, Checkbox, Poptip, Button } from 'view-ui-plus'
+import { CheckboxGroup, Checkbox, Poptip, Button, Icon, Input, Select } from 'view-ui-plus'
 // import Checkbox from '../checkbox/checkbox.vue';
 // import Poptip from '../poptip/poptip.vue';
 // import iButton from '../button/button.vue';
 import renderHeader from 'view-ui-plus/src/components/table/header';
-import Mixin from 'view-ui-plus/src/components/table/mixin';
+import Mixin from '../mixin';
 import Locale from 'view-ui-plus/src/mixins/locale';
 import { isClient } from 'view-ui-plus/src/utils/index';
 
 export default {
     name: 'VTableHead',
     mixins: [ Mixin, Locale ],
-    components: { CheckboxGroup, Checkbox, Poptip, Button, renderHeader },
+    components: { CheckboxGroup, Checkbox, Poptip, Button, renderHeader, Icon, Input, Select },
     props: {
         prefixCls: String,
         styleObject: Object,
@@ -29,7 +29,31 @@ export default {
         return {
             draggingColumn: null,
             dragging: false,
-            dragState: {}
+            dragState: {},
+            conditions: {
+                string: [
+                    'EMPTY',
+                    'NOT_EMPTY',
+                    'CONTAINS',
+                    'DOES_NOT_CONTAIN',
+                    'STARTS_WITH',
+                    'ENDS_WITH',
+                    'EQUAL',
+                    'NULL',
+                    'NOT_NULL',
+                ],
+                // possible conditions for numeric filter: 
+                number: [
+                    'EQUAL',
+                    'NOT_EQUAL',
+                    'LESS_THAN',
+                    'LESS_THAN_OR_EQUAL',
+                    'GREATER_THAN',
+                    'GREATER_THAN_OR_EQUAL',
+                    'NULL',
+                    'NOT_NULL'
+                ]
+            }
         };
     },
     computed: {

@@ -50,7 +50,7 @@
             </div>
             <div :class="fixedTableClasses" :style="fixedTableStyle" v-if="isLeftFixed">
                 <div :class="fixedHeaderClasses" v-if="showHeader">
-                    <table-head
+                    <VTableHead
                         fixed="left"
                         :prefix-cls="prefixCls"
                         :styleObject="fixedTableStyle"
@@ -59,7 +59,7 @@
                         :fixed-column-rows="leftFixedColumnRows"
                         :obj-data="objData"
                         :columns-width="columnsWidth"
-                        :data="rebuildData"></table-head>
+                        :data="rebuildData"></VTableHead>
                 </div>
                 <div :class="[prefixCls + '-fixed-body']" :style="fixedBodyStyle" ref="fixedBody" @mousewheel="handleFixedMousewheel" @DOMMouseScroll="handleFixedMousewheel">
                     <table-body
@@ -86,7 +86,7 @@
             </div>
             <div :class="fixedRightTableClasses" :style="fixedRightTableStyle" v-if="isRightFixed">
                 <div :class="fixedHeaderClasses" v-if="showHeader">
-                    <table-head
+                    <VTableHead
                         fixed="right"
                         :prefix-cls="prefixCls"
                         :styleObject="fixedRightTableStyle"
@@ -95,7 +95,7 @@
                         :fixed-column-rows="rightFixedColumnRows"
                         :obj-data="objData"
                         :columns-width="columnsWidth"
-                        :data="rebuildData"></table-head>
+                        :data="rebuildData"></VTableHead>
                 </div>
                 <div :class="[prefixCls + '-fixed-body']" :style="fixedBodyStyle" ref="fixedRightBody" @mousewheel="handleFixedMousewheel" @DOMMouseScroll="handleFixedMousewheel">
                     <table-body

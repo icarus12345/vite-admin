@@ -37,14 +37,16 @@
                                     <i class="ivu-icon ivu-icon-ios-funnel" :class="{on: getColumn(rowIndex, index)._isFiltered}"></i>
                                 </span>
 
-                                <template #content v-if="getColumn(rowIndex, index).filters === 'text'">
+                                <template #content v-if="['string', 'number'].includes(getColumn(rowIndex, index).filterType)">
                                     
                                     <div :class="[prefixCls + '-filter-list']">
                                         <div :class="[prefixCls + '-filter-list-item']">
-                                            <Input placeholder="Search" style="width: auto" v-model="getColumn(rowIndex, index)._filterValue">
-                                                <template #prefix>
-                                                    <Icon type="ios-search"/>
-                                                </template>
+                                            <div class="mb-2">
+                                                <Select v-model="getColumn(rowIndex, index)._filterCondition" :transfer="true" size="small" style="width: 160px">
+                                                    <Option v-for="(cond) in conditions[getColumn(rowIndex, index).filterType]" :value="cond">{{ cond }}</Option>
+                                                </Select>
+                                            </div>
+                                            <Input placeholder="Search" style="width: 220px" v-model="getColumn(rowIndex, index)._filterValue">
                                             </Input>
                                         </div>
                                         <div :class="[prefixCls + '-filter-footer']">
@@ -53,7 +55,7 @@
                                         </div>
                                     </div>
                                 </template>
-                                <template #content v-else-if="getColumn(rowIndex, index)._filterMultiple">
+                                <template #content v-else-if="getColumn(rowIndex, index).filterType === 'checkedList'">
                                     <div :class="[prefixCls + '-filter-list']">
                                         <div :class="[prefixCls + '-filter-list-item']">
                                             <checkbox-group v-model="getColumn(rowIndex, index)._filterChecked">
@@ -66,7 +68,7 @@
                                         </div>
                                     </div>
                                 </template>
-                                <template #content v-else>
+                                <template #content v-else-if="getColumn(rowIndex, index).filterType === 'list'">
                                     <div :class="[prefixCls + '-filter-list']">
                                         <ul :class="[prefixCls + '-filter-list-single']">
                                             <li

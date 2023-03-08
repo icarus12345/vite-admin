@@ -40,7 +40,11 @@ export default {
           sortType: 'desc',
           resizable: true,
           minWidth: 100,
-          filters: 'text',
+          filterable: true,
+          filterType: 'string', // list, string , checkedList, date, number, custom, range
+          filterRender() {
+
+          },
           filterMethod(value, row) {
             return row.address.indexOf(value) > -1;
           }
@@ -56,6 +60,7 @@ export default {
             }
             return a > b ? a : b;
           },
+          filterType: 'checkedList',
           filters: [],
           // filterMultiple: false,
           // filteredValue: [2],
@@ -75,6 +80,7 @@ export default {
           title: 'Status',
           slot: 'status',
           width: 70,
+          filterType: 'list',
           filters: [
             {
               label: 'New York',
@@ -90,7 +96,7 @@ export default {
             }
           ],
           filterMethod(value, row) {
-            return row.address.indexOf(value) > -1;
+            return row.address && row.address.indexOf(value) > -1;
           }
         },
         {
