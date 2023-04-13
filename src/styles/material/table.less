@@ -1,33 +1,30 @@
 .ivu-table-fixed.ivu-table-fixed-shadow {
     box-shadow: 2px 0 6px -2px rgb(0 0 0 / 5%);
 }
+.ivu-table-fixed-right.ivu-table-fixed-shadow {
+    box-shadow: -2px 0 6px -2px rgb(0 0 0 / 5%);
+}
 .ivu-modal-body {
-    > .ivu-table-quick-filter {
-        margin-bottom: 8px;
-    }
-    > .ivu-table-wrapper {
-        margin-left: -16px;
-        margin-right: -16px;
-        &:first-child {
-            margin-top: -16px;
-        }
-        table {
-            width: 100% !important;
-        }
-        .ivu-table-fixed::before, 
-        .ivu-table-fixed-right::before,
-        .ivu-table:before {
-            display: none;
-        }
-        th,td {
-            &:not(:last-of-type) {
-                .ivu-table-cell {
-                    padding-right: 10px;
-                }
+    > .v-table {
+        > .ivu-table-wrapper {
+            table {
+                width: 100% !important;
             }
-            &:not(:first-of-type) {
-                .ivu-table-cell {
-                    padding-left: 10px;
+            .ivu-table-fixed::before, 
+            .ivu-table-fixed-right::before,
+            .ivu-table:before {
+                display: none;
+            }
+            th,td {
+                &:not(:last-of-type) {
+                    .ivu-table-cell {
+                        padding-right: 10px;
+                    }
+                }
+                &:not(:first-of-type) {
+                    .ivu-table-cell {
+                        padding-left: 10px;
+                    }
                 }
             }
         }

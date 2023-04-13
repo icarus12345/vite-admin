@@ -1,4 +1,4 @@
-import { CheckboxGroup, Checkbox, Poptip, Button, Icon, Input, Select } from 'view-ui-plus'
+import { CheckboxGroup, Checkbox, Poptip, Button, Icon, Input, Select, DatePicker } from 'view-ui-plus'
 // import Checkbox from '../checkbox/checkbox.vue';
 // import Poptip from '../poptip/poptip.vue';
 // import iButton from '../button/button.vue';
@@ -10,7 +10,7 @@ import { isClient } from 'view-ui-plus/src/utils/index';
 export default {
     name: 'VTableHead',
     mixins: [ Mixin, Locale ],
-    components: { CheckboxGroup, Checkbox, Poptip, Button, renderHeader, Icon, Input, Select },
+    components: { CheckboxGroup, Checkbox, Poptip, Button, renderHeader, Icon, Input, Select, DatePicker },
     props: {
         prefixCls: String,
         styleObject: Object,
@@ -31,30 +31,73 @@ export default {
             dragging: false,
             dragState: {},
             conditions: {
-                string: [
-                    'EMPTY',
-                    'NOT_EMPTY',
-                    'CONTAINS',
-                    'DOES_NOT_CONTAIN',
-                    'STARTS_WITH',
-                    'ENDS_WITH',
-                    'EQUAL',
-                    'NULL',
-                    'NOT_NULL',
-                ],
+                string: {
+                    CONTAINS: 'Contains',
+                    DOES_NOT_CONTAIN: 'Does not contain',
+                    STARTS_WITH: 'Start with',
+                    ENDS_WITH: 'End with',
+                    EQUAL: 'Equal',
+                    NOT_EQUAL: 'Not equal',
+                    NULL: 'Null',
+                    NOT_NULL: 'Not null'
+                },
                 // possible conditions for numeric filter: 
-                number: [
-                    'EQUAL',
-                    'NOT_EQUAL',
-                    'LESS_THAN',
-                    'LESS_THAN_OR_EQUAL',
-                    'GREATER_THAN',
-                    'GREATER_THAN_OR_EQUAL',
-                    'NULL',
-                    'NOT_NULL'
-                ]
+                number: {
+                    EQUAL: 'Equal',
+                    NOT_EQUAL: 'Not equal',
+                    LESS_THAN: 'Less than',
+                    LESS_THAN_OR_EQUAL: 'Less than or equal',
+                    GREATER_THAN: 'Greater than',
+                    GREATER_THAN_OR_EQUAL: 'Greater than or equal',
+                    NULL: 'Null',
+                    NOT_NULL: 'Not null'
+                },
+                date: {
+                    EQUAL: 'Equal',
+                    NOT_EQUAL: 'Not equal',
+                    LESS_THAN: 'Less than',
+                    LESS_THAN_OR_EQUAL: 'Less than or equal',
+                    GREATER_THAN: 'Greater than',
+                    GREATER_THAN_OR_EQUAL: 'Greater than or equal',
+                    NULL: 'Null',
+                    NOT_NULL: 'Not null'
+                }
+            },
+            columnsState: {
             }
         };
+    },
+    created() {
+        [this.columns, this.columnRows, this.fixedColumnRows]
+            .flat(Infinity)
+            .filter(Boolean)
+            .filter(column => column.key)
+            .map(({key, filterable, filterType, sortable, sortType, filters}) => {
+                let filterValue;
+                if (filterType === 'date') {
+                    filterValue = [
+                        ['GREATER_THAN', ''],
+                        ['LESS_THAN', ''],
+                    ];
+                } else if (filterType === 'checkedList') {
+                    filterValue = [['IN', []]];
+                } else if (filterType === 'list') {
+                    filterValue = [['EQUAL', '']];
+                } else {
+                    filterValue = [['CONTAINS', '']];
+                }
+                this.columnsState[key] = {
+                    filterable,
+                    filterType,
+                    filters,
+                    filterVisible:  false,
+                    isFiltered:     false,
+                    filterValue,
+                    sortable,
+                    sortType
+                }
+            })
+            
     },
     computed: {
         styles () {
@@ -89,12 +132,23 @@ export default {
             return isSelectAll;
         },
         headRows () {
+            let hRows;
             const isGroup = this.columnRows.length > 1;
             if (isGroup) {
-                return this.fixed ? this.fixedColumnRows : this.columnRows;
+                hRows = this.fixed ? this.fixedColumnRows : this.columnRows;
             } else {
-                return [this.columns];
+                hRows = [this.columns];
             }
+            hRows.map((columns, row) => {
+                columns.map((column, col) => {
+                    if (isGroup) {
+                        column._index = this.columns.find(item => item.__id === col.id)._index;
+                    } else {
+                        column._index = this.columns[col]._index;
+                    }
+                })
+            })
+            return hRows;
         },
         isSelectDisabled () {
             let isSelectDisabled = true;
@@ -142,7 +196,7 @@ export default {
             return [
                 `${this.prefixCls}-filter-select-item`,
                 {
-                    [`${this.prefixCls}-filter-select-item-selected`]: column._filterChecked[0] === item.value
+                    [`${this.prefixCls}-filter-select-item-selected`]: this.columnsState[column.key].filterValue[0][1] === item.value
                 }
             ];
         },
@@ -150,7 +204,7 @@ export default {
             return [
                 `${this.prefixCls}-filter-select-item`,
                 {
-                    [`${this.prefixCls}-filter-select-item-selected`]: !column._filterChecked.length
+                    [`${this.prefixCls}-filter-select-item-selected`]: this.columnsState[column.key].filterValue[0][1] === ''
                 }
             ];
         },
@@ -158,52 +212,82 @@ export default {
             const status = !this.isSelectAll;
             this.$parent.selectAll(status);
         },
-        handleSort (index, type) {
-            // 在固定列时，寻找正确的 index #5580
-            const column = this.columns.find(item => item._index === index);
-            const _index = column._index;
+        handleSort (column, type) {
+            const state = this.columnsState[column.key];
+            Object.values(this.columnsState).forEach((state) => state.sortType = '');
 
-            if (column._sortType === type) {
-                type = 'normal';
+            if (state.sortType === type) {
+                type = '';
             }
-            this.$parent.handleSort(_index, type);
+            state.sortType = type;
+            this.$parent.handleSort(column.key, this.columnsState);
         },
-        handleSortByHead (index) {
+        handleSortByHead (column) {
+            const state = this.columnsState[column.key];
             // 在固定列时，寻找正确的 index #5580
-            const column = this.columns.find(item => item._index === index);
-            if (column.sortable) {
-                const type = column._sortType;
-                if (type === 'normal') {
-                    this.handleSort(index, 'asc');
-                } else if (type === 'asc') {
-                    this.handleSort(index, 'desc');
+            if (state.sortable) {
+                const type = state.sortType;
+                if (type === 'asc') {
+                    this.handleSort(column, 'desc');
+                } else if (type === 'desc'){
+                    this.handleSort(column, '');
                 } else {
-                    this.handleSort(index, 'normal');
+                    this.handleSort(column, 'asc');
                 }
             }
         },
-        handleFilter (index) {
-            this.$parent.handleFilter(index);
+        handleFilter (column) {
+            const state = this.columnsState[column.key];
+            state.isFiltered = true;
+            state.filterVisible = false
+            this.$parent.handleFilter(column.key, this.columnsState);
         },
-        handleSelect (index, value) {
-            this.$parent.handleFilterSelect(index, value);
+        handleFilterText(column) {
+
         },
-        handleReset (index) {
-            this.$parent.handleFilterReset(index);
+        handleFilterList(column) {
+            
         },
-        handleFilterHide (index) {
-            this.$parent.handleFilterHide(index);
+        handleFilterCheckList(column) {
+            
+        },
+        handleFilterDate(column) {
+            
+        },
+        handleSelect (column, value) {
+            const state = this.columnsState[column.key];
+            state.filterValue[0][1] = value;
+            this.handleFilter(column);
+        },
+        handleReset (column) {
+            const state = this.columnsState[column.key];
+            if (state.filterType === 'date') {
+                state.filterValue[0][1] = state.filterValue[1][1] = ''
+            } else if (state.filterType === 'checkedList') {
+                state.filterValue[0][1] = [];
+            } else if (state.filterType === 'list') {
+                state.filterValue[0][1] = '';
+            } else {
+                state.filterValue[0][1] = '';
+            }
+            state.isFiltered = false;
+            state.filterVisible = false
+            this.$parent.handleFilterReset(column.key);
+        },
+        handleFilterHide (column) {
+            this.$parent.handleFilterHide(column.key);
         },
         // 因为表头嵌套不是深拷贝，所以没有 _ 开头的方法，在 isGroup 下用此列
         getColumn (rowIndex, index) {
             const isGroup = this.columnRows.length > 1;
-
+            let column;
             if (isGroup) {
                 const id = this.headRows[rowIndex][index].__id;
-                return this.columns.filter(item => item.__id === id)[0];
+                column = this.columns.filter(item => item.__id === id)[0];
             } else {
-                return this.headRows[rowIndex][index];
+                column = this.headRows[rowIndex][index];
             }
+            return column;
         },
         handleMouseDown (column, event) {
             if (this.$isServer) return;

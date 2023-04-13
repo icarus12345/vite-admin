@@ -11,6 +11,7 @@ import ExportCsv from 'view-ui-plus/src/components/table';
 import Locale from 'view-ui-plus/src/mixins/locale';
 import elementResizeDetectorMaker from 'element-resize-detector';
 import { getAllColumns, convertToRows, convertColumnOrder, getRandomStr } from 'view-ui-plus/src/components/table/util';
+import LD from 'lodash';
 
 const prefixCls = 'ivu-table';
 
@@ -43,6 +44,21 @@ export default {
             type: Array,
             default () {
                 return [];
+            }
+        },
+        source: {
+            type: Object,
+            default () {
+                return {
+                    datafields:
+                    [
+                        { name: 'firstname', type: 'string' },
+                    ],
+                    url: '',
+                    beforeSend: (jqXHR, settings) => {},
+                    beforeLoadComplete: (records) => {},
+                    formatData: (data) => {}
+                }
             }
         },
         columns: {
@@ -185,6 +201,8 @@ export default {
     data () {
         const colsWithId = this.makeColumnsId(this.columns);
         return {
+            page: 1,
+            pageSize: 10,
             ready: false,
             tableWidth: 0,
             columnsWidth: {},
@@ -215,7 +233,8 @@ export default {
             },
             scrollOnTheLeft: false,
             scrollOnTheRight: false,
-            id: random(6)
+            id: random(6),
+            columnsState: {}
         };
     },
     computed: {
@@ -445,6 +464,24 @@ export default {
             }
 
             return sums;
+        },
+        sortBy() {
+            return LD.chain(this.columnsState)
+                .omitBy((state, key) => {
+                    return !state.sortType;
+                })
+                .map((state, key) => state.filterValue.map(d => [key, state.sortType]))
+                .value()
+        },
+        filterConditions() {
+            return LD.chain(this.columnsState)
+                .omitBy((state, key) => {
+                    return !state.isFiltered;
+                })
+                .map((state, key) => state.filterValue.map(d => [key,d[0],d[1]]))
+                .flatten()
+                .filter(d => ['NULL', 'NOT_NULL'].includes(d[1]) || d[2])
+                .value()
         }
     },
     methods: {
@@ -1026,66 +1063,117 @@ export default {
             }
             return data;
         },
-        handleSort (_index, type) {
-            const index = this.GetOriginalIndex(_index);
-            this.cloneColumns.forEach((col) => col._sortType = 'normal');
+        makeDataWithSortAndFilter2() {
+            console.log('makeDataWithSortAndFilter2')
+            const data = this.makeData()
+                .filter((row) => {
+                    return this.filterConditions
+                        .some(([key, operator, value]) => {
+                            const index = this.GetOriginalByKey(key);
+                            const column = this.cloneColumns[index];
+                            if (column.filterMethod) {
+                                return column.filterMethod(row, operator, value)
+                            }
+                            const rowValue = LD.get(row, column.map || column.key);
+                            switch(operator) {
+                                case 'STARTS_WITH':
+                                    return rowValue && rowValue.toLowerCase().startsWith(value.toLowerCase());
+                                case 'END_WITH':
+                                    return rowValue && rowValue.toLowerCase().endsWith(value.toLowerCase());
+                                case 'EQUAL':
+                                    return rowValue && rowValue.toLowerCase() === value.toLowerCase();
+                                case 'NOT_EQUAL':
+                                    return !(rowValue && rowValue.toLowerCase() === value.toLowerCase());
+                                case 'DOES_NOT_CONTAIN':
+                                    return !(rowValue && rowValue.toLowerCase().includes(value.toLowerCase()));
+                                case 'NULL':
+                                    return (!rowValue || rowValue.length === 0)
+                                case 'NOT_NULL':
+                                    return !(!rowValue || rowValue.length === 0)
+                                case 'LESS_THAN':
+                                    return +rowValue < +value
+                                case 'LESS_THAN_OR_EQUAL':
+                                    return +rowValue <= +value
+                                case 'GREATER_THAN':
+                                    return +rowValue > +value
+                                case 'GREATER_THAN_OR_EQUAL':
+                                    return +rowValue >= +value
+                                case 'IN':
+                                    return value.includes(rowValue)
+                                case 'CONTAINS':
+                                default:
+                                    return rowValue && rowValue.toLowerCase().includes(value.toLowerCase());
+                            }
+                        })
+                })
+            console.log(this.sortBy, 'sortBy')
+            // sort
+            return data;
+        },
+        filterData2 (data, condition) {
 
-            const key = this.cloneColumns[index].key;
-            if (this.cloneColumns[index].sortable !== 'custom') {    // custom is for remote sort
-                if (type === 'normal') {
-                    this.rebuildData = this.makeDataWithFilter();
-                } else {
-                    this.rebuildData = this.sortData(this.rebuildData, type, index);
-                }
+        },
+        handleSort (key, columnsState) {
+            this.columnsState = columnsState
+            const index = this.GetOriginalByKey(key);
+            const order = columnsState[key].sortType;
+            if (!order) {
+                this.rebuildData = this.makeDataWithFilter();
+            } else {
+                this.rebuildData = this.sortData(this.rebuildData, order, index);
             }
-            this.cloneColumns[index]._sortType = type;
 
             this.$emit('on-sort-change', {
                 column: JSON.parse(JSON.stringify(this.allColumns[this.cloneColumns[index]._index])),
-                key: key,
-                order: type
+                key,
+                order
             });
         },
-        handleFilterHide (index) {    // clear checked that not filter now
-            if (!this.cloneColumns[index]._isFiltered) this.cloneColumns[index]._filterChecked = [];
+        handleFilterHide (column) {    // clear checked that not filter now
+            // if (!this.cloneColumns[index]._isFiltered) this.cloneColumns[index]._filterChecked = [];
         },
         filterData (data, column) {
             return data.filter((row) => {
                 //如果定义了远程过滤方法则忽略此方法
-                if (typeof column.filterRemote === 'function') return true;
+                // if (typeof column.filterRemote === 'function') return true;
 
-                let status = !column._filterChecked.length;
-                for (let i = 0; i < column._filterChecked.length; i++) {
-                    status = column.filterMethod(column._filterChecked[i], row);
-                    if (status) break;
-                }
-                return status;
+                // let status = !column._filterChecked.length;
+                // // TODO: Handle filter
+                // for (let i = 0; i < column._filterChecked.length; i++) {
+                //     status = column.filterMethod(column._filterChecked[i], row);
+                //     if (status) break;
+                // }
+                // return status;
+                return true;
             });
         },
         filterOtherData (data, index) {
-            let column = this.cloneColumns[index];
-            if (typeof column.filterRemote === 'function') {
-                column.filterRemote.call(this.$parent, column._filterChecked, column.key, column);
-            }
+            // let column = this.cloneColumns[index];
+            // if (typeof column.filterRemote === 'function') {
+            //     column.filterRemote.call(this.$parent, column._filterChecked, column.key, column);
+            // }
 
-            this.cloneColumns.forEach((col, colIndex) => {
-                if (colIndex !== index) {
-                    data = this.filterData(data, col);
-                }
-            });
+            // this.cloneColumns.forEach((col, colIndex) => {
+            //     if (colIndex !== index) {
+            //         data = this.filterData(data, col);
+            //     }
+            // });
             return data;
         },
-        handleFilter (index) {
+        handleFilter (key, columnsState) {
+            const index = this.GetOriginalByKey(key);
+            this.columnsState = columnsState
             const column = this.cloneColumns[index];
-            let filterData = this.makeDataWithSort();
+            // let filterData = this.makeDataWithSort();
 
             // filter others first, after filter this column
-            filterData = this.filterOtherData(filterData, index);
-            this.rebuildData = this.filterData(filterData, column);
+            // filterData = this.filterOtherData(filterData, index);
+            this.rebuildData = this.makeDataWithSortAndFilter2();
 
-            this.cloneColumns[index]._isFiltered = true;
-            this.cloneColumns[index]._filterVisible = false;
-            this.$emit('on-filter-change', column);
+            this.$emit('on-filter-change', {
+                column,
+                columnsState
+            });
         },
         /**
          * #2832
@@ -1097,16 +1185,14 @@ export default {
         GetOriginalIndex (_index) {
             return this.cloneColumns.findIndex(item => item._index === _index);
         },
-        handleFilterSelect (_index, value) {
-            const index = this.GetOriginalIndex(_index);
-            this.cloneColumns[index]._filterChecked = [value];
-            this.handleFilter(index);
+        GetOriginalByKey (key) {
+            return this.cloneColumns.findIndex(item => item.key === key);
         },
-        handleFilterReset (_index) {
-            const index = this.GetOriginalIndex(_index);
-            this.cloneColumns[index]._isFiltered = false;
-            this.cloneColumns[index]._filterVisible = false;
-            this.cloneColumns[index]._filterChecked = [];
+        handleFilterReset (key) {
+            const index = this.GetOriginalByKey(key);
+            // this.cloneColumns[index]._isFiltered = false;
+            // this.cloneColumns[index]._filterVisible = false;
+            // this.cloneColumns[index]._filterChecked = [];
 
             let filterData = this.makeDataWithSort();
             filterData = this.filterOtherData(filterData, index);
@@ -1253,23 +1339,21 @@ export default {
                 column.width = parseInt(column.width);
                 column._width = column.width ? column.width : '';    // update in handleResize()
                 column._sortType = 'normal';
-                column._filterVisible = false;
-                column._isFiltered = false;
-                column._filterChecked = [];
 
-                if ('filterMultiple' in column) {
-                    column._filterMultiple = column.filterMultiple;
-                } else {
-                    column._filterMultiple = true;
-                }
-                if ('filteredValue' in column) {
-                    column._filterChecked = column.filteredValue;
-                    column._isFiltered = true;
-                }
 
-                if ('sortType' in column) {
-                    column._sortType = column.sortType;
-                }
+                // column._filterChecked = [];
+
+                // if ('filterMultiple' in column) {
+                //     column._filterMultiple = column.filterMultiple;
+                // } else {
+                //     column._filterMultiple = true;
+                // }
+                // if ('filteredValue' in column) {
+                //     column._filterChecked = column.filteredValue;
+                //     column._isFiltered = true;
+                // }
+
+                
 
                 if (column.fixed && column.fixed === 'left') {
                     left.push(column);
@@ -1345,7 +1429,16 @@ export default {
         },
         handleClickDropdownItem () {
             if (this.autoCloseContextmenu) this.closeContextMenu()
-        }
+        },
+        pageChange(page) {
+            this.page = page;
+        },
+        pageSizeChange(size) {
+            this.size = size;
+            if (this.page === 1) {
+            }
+        },
+        
     },
     created () {
         if (!this.context) this.currentContext = this.$parent;

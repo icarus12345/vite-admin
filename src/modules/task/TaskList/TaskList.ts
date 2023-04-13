@@ -22,7 +22,7 @@ export default {
     const me = this;
     return {
       page: 1,
-      size: 10,
+      size: 100,
       loading: true,
       columns: [
         {
@@ -31,79 +31,100 @@ export default {
           align: 'center',
           fixed: 'left'
         },
-        {
-          title: 'Title',
-          slot: 'title',
-          // ellipsis: true,
-          // tooltip: true,
-          sortable: true,
-          sortType: 'desc',
-          resizable: true,
-          minWidth: 100,
-          filterable: true,
-          filterType: 'string', // list, string , checkedList, date, number, custom, range
-          filterRender() {
-
-          },
-          filterMethod(value, row) {
-            return row.address.indexOf(value) > -1;
-          }
-        },
-        {
-          title: 'User',
-          slot: 'user',
-          width: 160,
-          sortable: true,
-          sortMethod(a, b, type) {
-            if (type === 'desc') {
-              return a > b ? b : a;
-            }
-            return a > b ? a : b;
-          },
-          filterType: 'checkedList',
-          filters: [],
-          // filterMultiple: false,
-          // filteredValue: [2],
-          // filterMethod (value, row) {
-          //   console.log(value,row,'value')
-          //   if (value === 1) {
-          //     return row.age > 25;
-          //   } else if (value === 2) {
-          //     return row.age < 25;
-          //   }
-          // },
-          filterRemote(value: any, column: string) {
-            console.log(value, column, this)
-          }
-        },
-        {
-          title: 'Status',
-          slot: 'status',
-          width: 70,
-          filterType: 'list',
-          filters: [
             {
-              label: 'New York',
-              value: 'New York'
+              title: 'Title',
+              slot: 'title',
+              key: 'title',
+              // ellipsis: true,
+              // tooltip: true,
+              sortable: true,
+              sortType: 'desc',
+              resizable: true,
+              minWidth: 160,
+              filterable: true,
+              filterType: 'string', // list, string , checkedList, date, number, custom, range
+              filterRender() {
+    
+              },
+              // filterMethod(row, operator, value) {
+              //   return row.title.include(value);
+              // }
             },
             {
-              label: 'London',
-              value: 'London'
+              title: 'User',
+              slot: 'user',
+              key: 'user',
+              map: 'user.name',
+              width: 160,
+              sortable: true,
+              sortMethod(a, b, type) {
+                if (type === 'desc') {
+                  return a > b ? b : a;
+                }
+                return a > b ? a : b;
+              },
+              filterable: true,
+              filterType: 'checkedList',
+              filters: [{
+                label: 'New York',
+                value: 'New York'
+              },
+              {
+                label: 'London',
+                value: 'London'
+              },
+              {
+                label: 'Sydney',
+                value: 'Sydney'
+              }],
+              // filterMultiple: false,
+              // filteredValue: [2],
+              // filterMethod(row, operator, value) {
+              //   return value.includes(row.user.name);
+              // }
             },
             {
-              label: 'Sydney',
-              value: 'Sydney1111'
-            }
-          ],
-          filterMethod(value, row) {
-            return row.address && row.address.indexOf(value) > -1;
-          }
-        },
+              title: 'Status',
+              slot: 'status',
+              key: 'status',
+              width: 80,
+              filterable: true,
+              filterType: 'list',
+              filters: [
+                {
+                  label: 'New York',
+                  value: 'New York'
+                },
+                {
+                  label: 'London',
+                  value: 'London'
+                },
+                {
+                  label: 'Sydney',
+                  value: 'Sydney1111'
+                }
+              ],
+              filterMethod(value, row) {
+                return row.address && row.address.indexOf(value) > -1;
+              }
+            },
+            {
+              title: 'Create Date',
+              key: 'create_date',
+              width: 120,
+              filterable: true,
+              filterType: 'date',
+              
+              // filterMethod(row, operator, value) {
+              //   return true
+              // }
+            },
         {
           title: '#',
           slot: 'action',
           width: 52,
           align: 'center',
+          fixed: 'right',
           className: 'ivu-table-column-action',
           renderHeader(h, params) {
             return h( Button, {
@@ -129,7 +150,7 @@ export default {
         this.columns[2].filters = users.map(u => {
           return {
             label: u.name,
-            value: u.id
+            value: u.name
           }
         })
       })

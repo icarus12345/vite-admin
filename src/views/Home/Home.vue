@@ -32,16 +32,7 @@
   </Row>
   <Button type="primary" @click="show">Show</Button>
   <Button type="primary" @click="showModal = true">Welcome!</Button>
-  <Modal v-model="showModal" draggable sticky scrollable :mask="false" ok-text="OK" cancel-text="Cancel" width="600">
-    <template #header>
-      <div class="ivu-modal-header-inner">
-        <Icon type="md-arrow-back" size="20"/>
-        <Divider type="verticle"></Divider>
-        <span>Title</span>
-      </div>
-    </template>
-    <TaskList />
-  </Modal>
+  
   <Image width="200px" height="100px" lazy src="https://file.iviewui.com/images/image-demo-1.jpg" preview/>
   <Image width="200px" height="100px">
       <template #error>

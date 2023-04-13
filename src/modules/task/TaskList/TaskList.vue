@@ -1,11 +1,4 @@
 <template>
-  <div class="ivu-table-quick-filter">
-    <Input placeholder="Enter name" style="width: auto">
-      <template #prefix>
-        <Icon type="ios-search"/>
-      </template>
-    </Input>
-  </div>
   <VTable ref="selection" 
     :columns="columns" 
     :data="data" 
@@ -48,8 +41,6 @@
       </Dropdown>
     </template>
   </VTable>
-
-  <Page :total="400" size="small" show-sizer show-total class="ivu-table-page" @on-change="pageChange" @on-page-size-change="pageSizeChange"/>
 </template>
 <script lang="ts" src="./TaskList.ts"></script>
 
