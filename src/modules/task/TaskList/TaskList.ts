@@ -29,102 +29,104 @@ export default {
           type: 'selection',
           width: 46,
           align: 'center',
-          fixed: 'left'
+          fixed: 'left',
+          sticky: 'left'
         },
+        {
+          title: 'Title',
+          slot: 'title',
+          key: 'title',
+          // ellipsis: true,
+          // tooltip: true,
+          sortable: true,
+          sortType: 'desc',
+          resizable: true,
+          minWidth: 160,
+          filterable: true,
+          filterType: 'string', // list, string , checkedList, date, number, custom, range
+          filterRender() {
+
+          },
+          // filterMethod(row, operator, value) {
+          //   return row.title.include(value);
+          // }
+        },
+        {
+          title: 'User',
+          slot: 'user',
+          key: 'user',
+          map: 'user.name',
+          width: 160,
+          sortable: true,
+          sortMethod(a, b, type) {
+            if (type === 'desc') {
+              return a > b ? b : a;
+            }
+            return a > b ? a : b;
+          },
+          filterable: true,
+          filterType: 'checkedList',
+          filters: [{
+            label: 'New York',
+            value: 'New York'
+          },
+          {
+            label: 'London',
+            value: 'London'
+          },
+          {
+            label: 'Sydney',
+            value: 'Sydney'
+          }],
+          // filterMultiple: false,
+          // filteredValue: [2],
+          // filterMethod(row, operator, value) {
+          //   return value.includes(row.user.name);
+          // }
+        },
+        {
+          title: 'Status',
+          slot: 'status',
+          key: 'status',
+          width: 80,
+          filterable: true,
+          filterType: 'list',
+          filters: [
             {
-              title: 'Title',
-              slot: 'title',
-              key: 'title',
-              // ellipsis: true,
-              // tooltip: true,
-              sortable: true,
-              sortType: 'desc',
-              resizable: true,
-              minWidth: 160,
-              filterable: true,
-              filterType: 'string', // list, string , checkedList, date, number, custom, range
-              filterRender() {
-    
-              },
-              // filterMethod(row, operator, value) {
-              //   return row.title.include(value);
-              // }
+              label: 'New York',
+              value: 'New York'
             },
             {
-              title: 'User',
-              slot: 'user',
-              key: 'user',
-              map: 'user.name',
-              width: 160,
-              sortable: true,
-              sortMethod(a, b, type) {
-                if (type === 'desc') {
-                  return a > b ? b : a;
-                }
-                return a > b ? a : b;
-              },
-              filterable: true,
-              filterType: 'checkedList',
-              filters: [{
-                label: 'New York',
-                value: 'New York'
-              },
-              {
-                label: 'London',
-                value: 'London'
-              },
-              {
-                label: 'Sydney',
-                value: 'Sydney'
-              }],
-              // filterMultiple: false,
-              // filteredValue: [2],
-              // filterMethod(row, operator, value) {
-              //   return value.includes(row.user.name);
-              // }
+              label: 'London',
+              value: 'London'
             },
             {
-              title: 'Status',
-              slot: 'status',
-              key: 'status',
-              width: 80,
-              filterable: true,
-              filterType: 'list',
-              filters: [
-                {
-                  label: 'New York',
-                  value: 'New York'
-                },
-                {
-                  label: 'London',
-                  value: 'London'
-                },
-                {
-                  label: 'Sydney',
-                  value: 'Sydney1111'
-                }
-              ],
-              filterMethod(value, row) {
-                return row.address && row.address.indexOf(value) > -1;
-              }
-            },
-            {
-              title: 'Create Date',
-              key: 'create_date',
-              width: 120,
-              filterable: true,
-              filterType: 'date',
-              
-              // filterMethod(row, operator, value) {
-              //   return true
-              // }
-            },
+              label: 'Sydney',
+              value: 'Sydney1111'
+            }
+          ],
+          filterMethod(value, row) {
+            return row.address && row.address.indexOf(value) > -1;
+          }
+        },
+        {
+          title: 'Create Date',
+          key: 'create_date',
+          width: 120,
+          filterable: true,
+          filterType: 'date',
+          
+          // filterMethod(row, operator, value) {
+          //   return true
+          // }
+        },
         {
           title: '#',
           slot: 'action',
           width: 52,
           align: 'center',
           fixed: 'right',
+          sticky: 'right',
           className: 'ivu-table-column-action',
           renderHeader(h, params) {
             return h( Button, {
@@ -139,7 +141,23 @@ export default {
           }
         }
       ],
-      data: []
+      data: [],
+      dataSource: {
+        url: 'https://jsonplaceholder.typicode.com/todos',
+        beforeSend: (params: any) => {
+          params._expand = 'user';
+          params._start = (params.page - 1) * params.pageSize;
+          params._limit = params.pageSize
+        },
+        beforeLoadComplete: (records: any) => {
+          return {
+            records: records,
+            totalRecords: 500
+          }
+        },
+        // formatData: (records: any) => {},
+        // loadServerData: (settings: any, source: any, callback: any) => {}
+      }
     }
   },
   created() {
@@ -168,7 +186,7 @@ export default {
           finalize(() => (this.loading = false))
         )
         .subscribe((tasks) => {
-          this.data = tasks
+          // this.data = tasks
         })
     },
     sortChange(event: any) {

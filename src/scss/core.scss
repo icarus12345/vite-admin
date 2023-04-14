@@ -1,20 +1,69 @@
-.flex-center{
-    display: flex;
-    align-items: center;
-    justify-content: center;
+:root {
+  --overflow: overlay;
+  --scrollbar-size: 7px;
+  --scrollbar-border-radius: 3px;
+  --scrollbar-padding: 16px;
+  --scrollbar-track-color: rgba(0, 0, 0, .075);
+  --scrollbar-hover-track-color: rgba(0, 0, 0, .1);
+  --scrollbar-track-hover-color: rgba(0, 0, 0, .125);
+  --scrollbar-thumb-color: rgba(0, 0, 0, .15);
+  --scrollbar-hover-thumb-color: rgba(0, 0, 0, .2);
+  --scrollbar-thumb-hover-color: rgba(0, 0, 0, .25);
 }
-.flex-start{
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
+
+@supports not (overflow: overlay) {
+  :root {
+    --overflow: auto;
+  }
 }
-.flex-end{
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+
+::-webkit-scrollbar {
+  width: var(--scrollbar-size);
+  height: var(--scrollbar-size)
 }
-.flex-between{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+
+::-webkit-scrollbar-track {
+  border: none;
+  background: var(--scrollbar-track-color);
+  border-radius: var(--scrollbar-border-radius);
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb {
+  border: none;
+  background: var(--scrollbar-thumb-color);
+  border-radius: var(--scrollbar-border-radius);
+  transition: background 0.2s ease;
+}
+
+:hover::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-hover-thumb-color);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover-color);
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-start {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.flex-end {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }

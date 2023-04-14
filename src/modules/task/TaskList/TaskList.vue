@@ -3,6 +3,7 @@
     :columns="columns" 
     :data="data" 
     :loading="loading"
+    :source="dataSource"
     height="320" size="small"
     fixed-shadow="auto"
     @on-sort-change="sortChange"
@@ -12,14 +13,14 @@
     context-menu
     show-context-menu>
       <template #title="{ row }">
-          <div v-line-clamp="2">{{ row.title }}</div>
+        <div v-line-clamp="2">{{ row.title }}</div>
       </template>
       <template #user="{ row }">
-          <div>{{ row.user.name }}</div>
-          <small>{{ row.user.email }}</small>
+        <div>{{ row.user.name }}</div>
+        <small>{{ row.user.email }}</small>
       </template>
       <template #status="{ row }">
-          <Checkbox v-model="row.completed" class="pe-none"></Checkbox>
+        <Checkbox v-model="row.completed" class="pe-none"></Checkbox>
       </template>
     <template #contextMenu>
       <DropdownItem><Icon type="md-add" size="16"/> Add New</DropdownItem>

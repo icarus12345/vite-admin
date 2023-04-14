@@ -3,7 +3,7 @@ import VTableHead from '../TableHead/TableHead.vue';
 import tableBody from 'view-ui-plus/src/components/table/table-body.vue';
 import tableSummary from 'view-ui-plus/src/components/table/summary.vue';
 import { Dropdown, DropdownMenu, Spin } from 'view-ui-plus';
-import { oneOf, getStyle, deepCopy, getScrollBarSize } from 'view-ui-plus/src/utils/assist';
+import { oneOf, getStyle, deepCopy } from 'view-ui-plus/src/utils/assist';
 import { on, off } from 'view-ui-plus/src/utils/dom';
 import random from 'view-ui-plus/src/utils/random_str';
 import Csv from 'view-ui-plus/src/utils/csv';
@@ -11,12 +11,16 @@ import ExportCsv from 'view-ui-plus/src/components/table';
 import Locale from 'view-ui-plus/src/mixins/locale';
 import elementResizeDetectorMaker from 'element-resize-detector';
 import { getAllColumns, convertToRows, convertColumnOrder, getRandomStr } from 'view-ui-plus/src/components/table/util';
-import LD from 'lodash';
+import LD, { isObject, isArray } from 'lodash';
+import { getScrollBarSize } from '@/utils'
+import { DataAdapter } from '@/services'
 
 const prefixCls = 'ivu-table';
 
 let rowKey = 1;
 let columnKey = 1;
+
+
 
 export default {
     name: 'VTable',
@@ -40,22 +44,18 @@ export default {
         }
     },
     props: {
-        data: {
-            type: Array,
-            default () {
-                return [];
-            }
-        },
+        // data: {
+        //     type: Array,
+        //     default () {
+        //         return [];
+        //     }
+        // },
         source: {
             type: Object,
             default () {
                 return {
-                    datafields:
-                    [
-                        { name: 'firstname', type: 'string' },
-                    ],
                     url: '',
-                    beforeSend: (jqXHR, settings) => {},
+                    beforeSend: (xhr, settings) => {},
                     beforeLoadComplete: (records) => {},
                     formatData: (data) => {}
                 }
@@ -203,6 +203,9 @@ export default {
         return {
             page: 1,
             pageSize: 10,
+            pageSizeOpts: [10, 20, 50, 100, 200, 500],
+            totalRecords: 0,
+            data: [],
             ready: false,
             tableWidth: 0,
             columnsWidth: {},
@@ -234,7 +237,8 @@ export default {
             scrollOnTheLeft: false,
             scrollOnTheRight: false,
             id: random(6),
-            columnsState: {}
+            columnsState: {},
+            dataAdapter: new DataAdapter(this.source)
         };
     },
     computed: {
@@ -482,6 +486,14 @@ export default {
                 .flatten()
                 .filter(d => ['NULL', 'NOT_NULL'].includes(d[1]) || d[2])
                 .value()
+        },
+        bindingSetting() {
+            return {
+                page: this.page,
+                pageSize: this.pageSize,
+                filters: this.filterConditions,
+                sorts: this.sortBy
+            }
         }
     },
     methods: {
@@ -1117,11 +1129,13 @@ export default {
             this.columnsState = columnsState
             const index = this.GetOriginalByKey(key);
             const order = columnsState[key].sortType;
-            if (!order) {
-                this.rebuildData = this.makeDataWithFilter();
-            } else {
-                this.rebuildData = this.sortData(this.rebuildData, order, index);
-            }
+            // Server side
+            this.dataAdapter.dataBind(this.bindingSetting);
+            // if (!order) {
+            //     this.rebuildData = this.makeDataWithFilter();
+            // } else {
+            //     this.rebuildData = this.sortData(this.rebuildData, order, index);
+            // }
 
             this.$emit('on-sort-change', {
                 column: JSON.parse(JSON.stringify(this.allColumns[this.cloneColumns[index]._index])),
@@ -1164,11 +1178,13 @@ export default {
             const index = this.GetOriginalByKey(key);
             this.columnsState = columnsState
             const column = this.cloneColumns[index];
+            // Server side
+            this.page = 1;
+            this.dataAdapter.dataBind(this.bindingSetting);
             // let filterData = this.makeDataWithSort();
-
             // filter others first, after filter this column
             // filterData = this.filterOtherData(filterData, index);
-            this.rebuildData = this.makeDataWithSortAndFilter2();
+            // this.rebuildData = this.makeDataWithSortAndFilter2();
 
             this.$emit('on-filter-change', {
                 column,
@@ -1194,9 +1210,12 @@ export default {
             // this.cloneColumns[index]._filterVisible = false;
             // this.cloneColumns[index]._filterChecked = [];
 
-            let filterData = this.makeDataWithSort();
-            filterData = this.filterOtherData(filterData, index);
-            this.rebuildData = filterData;
+            this.page = 1;
+            this.dataAdapter.dataBind(this.bindingSetting);
+
+            // let filterData = this.makeDataWithSort();
+            // filterData = this.filterOtherData(filterData, index);
+            // this.rebuildData = filterData;
             this.$emit('on-filter-change', this.cloneColumns[index]);
         },
         makeData () {
@@ -1282,21 +1301,23 @@ export default {
         },
         makeObjData () {
             let data = {};
-            this.data.forEach((row, index) => {
-                const newRow = this.makeObjBaseData(row);
-                if (newRow.children && newRow.children.length) {
-                    if (newRow._showChildren) {
-                        newRow._isShowChildren = newRow._showChildren;
-                    } else {
-                        newRow._isShowChildren = false;
+            if (this.data) {
+                this.data.forEach((row, index) => {
+                    const newRow = this.makeObjBaseData(row);
+                    if (newRow.children && newRow.children.length) {
+                        if (newRow._showChildren) {
+                            newRow._isShowChildren = newRow._showChildren;
+                        } else {
+                            newRow._isShowChildren = false;
+                        }
+                        newRow.children = this.makeChildrenObjData(newRow);
                     }
-                    newRow.children = this.makeChildrenObjData(newRow);
-                }
-                // else if ('_loading' in newRow && newRow.children && newRow.children.length === 0) {
-                //     newRow._isShowChildren = false;
-                // }
-                data[index] = newRow;
-            });
+                    // else if ('_loading' in newRow && newRow.children && newRow.children.length === 0) {
+                    //     newRow._isShowChildren = false;
+                    // }
+                    data[index] = newRow;
+                });
+            }
             return data;
         },
         makeChildrenObjData (data) {
@@ -1432,11 +1453,14 @@ export default {
         },
         pageChange(page) {
             this.page = page;
+            this.dataAdapter.dataBind(this.bindingSetting);
         },
-        pageSizeChange(size) {
-            this.size = size;
-            if (this.page === 1) {
-            }
+        pageSizeChange(pageSize) {
+            this.pageSize = pageSize;
+            this.page = 1;
+            // if (this.page === 1) {
+            // }
+            this.dataAdapter.dataBind(this.bindingSetting);
         },
         
     },
@@ -1445,6 +1469,19 @@ export default {
         this.showSlotHeader = this.$slots.header !== undefined;
         this.showSlotFooter = this.$slots.footer !== undefined;
         this.rebuildData = this.makeDataWithSortAndFilter();
+        // INIT
+        this.dataAdapter.bind$.subscribe((resource) => {
+            if (isArray(resource)) {
+                this.data = resource;
+                this.totalRecords = resource.length;
+            } else if(isObject(resource)) {
+                this.data = resource.records;
+                this.totalRecords = resource.totalRecords;
+            }
+            this.objData = this.makeObjData();
+            this.rebuildData = this.makeData();
+            this.cloneData = deepCopy(this.data);
+        })
     },
     mounted () {
         this.addTable('TabsInstance');
@@ -1452,7 +1489,10 @@ export default {
         this.addTable('DrawerInstance');
 
         this.handleResize();
-        nextTick(() => this.ready = true);
+        nextTick(() => {
+            this.ready = true
+            this.dataAdapter.dataBind(this.bindingSetting);
+        });
 
         on(window, 'resize', this.handleResize);
         this.observer = elementResizeDetectorMaker();
@@ -1469,19 +1509,22 @@ export default {
         this.observer = null;
     },
     watch: {
-        data: {
+        source: {
             handler () {
-                const oldDataLen = this.rebuildData.length;
-                this.objData = this.makeObjData();
-                this.rebuildData = this.makeDataWithSortAndFilter();
-                this.handleResize();
-                if (!oldDataLen) {
-                    this.fixedHeader();
+                if (isArray(this.source)) {
+                    this.data = this.source;
+                    const oldDataLen = this.rebuildData.length;
+                    this.objData = this.makeObjData();
+                    this.rebuildData = this.makeDataWithSortAndFilter();
+                    this.handleResize();
+                    if (!oldDataLen) {
+                        this.fixedHeader();
+                    }
+                    // here will trigger before clickCurrentRow, so use async
+                    setTimeout(() => {
+                        this.cloneData = deepCopy(this.data);
+                    }, 0);
                 }
-                // here will trigger before clickCurrentRow, so use async
-                setTimeout(() => {
-                    this.cloneData = deepCopy(this.data);
-                }, 0);
             },
             deep: true
         },

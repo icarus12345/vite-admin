@@ -141,11 +141,21 @@
                     </template>
                 </Dropdown>
             </div>
-            <Spin fix :show="loading">
+            <Spin fix :show="dataAdapter.loading || loading">
                 <slot name="loading"></slot>
             </Spin>
         </div>
-        <Page :total="400" :size="size" :page-size="pageSize" :model-value="page" show-sizer show-total class="ivu-table-page" @on-change="pageChange" @on-page-size-change="pageSizeChange"/>
+        <Page
+            :size="size"
+            :page-size="pageSize"
+            :page-size-opts="pageSizeOpts"
+            :total="totalRecords"
+            :model-value="page"
+            show-sizer
+            show-total
+            class="ivu-table-page"
+            @on-change="pageChange"
+            @on-page-size-change="pageSizeChange"/>
     </div>
 </template>
 <script src="./Table.js"></script>
