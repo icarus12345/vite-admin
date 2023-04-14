@@ -201,6 +201,7 @@ export default {
     data () {
         const colsWithId = this.makeColumnsId(this.columns);
         return {
+            keyword: '',
             page: 1,
             pageSize: 10,
             pageSizeOpts: [10, 20, 50, 100, 200, 500],
@@ -489,6 +490,7 @@ export default {
         },
         bindingSetting() {
             return {
+                keyword: this.keyword,
                 page: this.page,
                 pageSize: this.pageSize,
                 filters: this.filterConditions,
@@ -1148,7 +1150,6 @@ export default {
         },
         filterData (data, column) {
             return data.filter((row) => {
-                //如果定义了远程过滤方法则忽略此方法
                 // if (typeof column.filterRemote === 'function') return true;
 
                 // let status = !column._filterChecked.length;
@@ -1203,6 +1204,10 @@ export default {
         },
         GetOriginalByKey (key) {
             return this.cloneColumns.findIndex(item => item.key === key);
+        },
+        handleSearch() {
+            this.page = 1;
+            this.dataAdapter.dataBind(this.bindingSetting);
         },
         handleFilterReset (key) {
             const index = this.GetOriginalByKey(key);
@@ -1481,6 +1486,7 @@ export default {
             this.objData = this.makeObjData();
             this.rebuildData = this.makeData();
             this.cloneData = deepCopy(this.data);
+           nextTick(()=>this.fixedHeader());
         })
     },
     mounted () {

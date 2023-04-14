@@ -22,7 +22,7 @@ export function getScrollBarSize(fresh: boolean) {
     document.body.appendChild(outer);
 
     const widthContained = inner.offsetWidth;
-    outer.style.overflow = 'var(--overflow, scroll)';
+    outer.style.overflow = 'scroll';
     let widthScroll = inner.offsetWidth;
 
     if (widthContained === widthScroll) {

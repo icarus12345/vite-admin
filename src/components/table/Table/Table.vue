@@ -1,11 +1,7 @@
 <template>
     <div class="v-table">
         <div class="ivu-table-quick-filter">
-            <Input placeholder="Enter name" style="width: auto">
-            <template #prefix>
-                <Icon type="ios-search"/>
-            </template>
-            </Input>
+            <Input placeholder="Search" style="width: auto" search @on-search="handleSearch" v-model="keyword"></Input>
         </div>
         <div :class="wrapClasses" :style="styles" ref="tableWrap">
             <div :class="classes">

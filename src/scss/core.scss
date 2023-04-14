@@ -17,32 +17,32 @@
   }
 }
 
-::-webkit-scrollbar {
-  width: var(--scrollbar-size);
-  height: var(--scrollbar-size)
-}
+// ::-webkit-scrollbar {
+//   width: var(--scrollbar-size);
+//   height: var(--scrollbar-size)
+// }
 
-::-webkit-scrollbar-track {
-  border: none;
-  background: var(--scrollbar-track-color);
-  border-radius: var(--scrollbar-border-radius);
-  transition: background 0.2s ease;
-}
+// ::-webkit-scrollbar-track {
+//   border: none;
+//   background: var(--scrollbar-track-color);
+//   border-radius: var(--scrollbar-border-radius);
+//   transition: background 0.2s ease;
+// }
 
-::-webkit-scrollbar-thumb {
-  border: none;
-  background: var(--scrollbar-thumb-color);
-  border-radius: var(--scrollbar-border-radius);
-  transition: background 0.2s ease;
-}
+// ::-webkit-scrollbar-thumb {
+//   border: none;
+//   background: var(--scrollbar-thumb-color);
+//   border-radius: var(--scrollbar-border-radius);
+//   transition: background 0.2s ease;
+// }
 
-:hover::-webkit-scrollbar-thumb {
-  background: var(--scrollbar-hover-thumb-color);
-}
+// :hover::-webkit-scrollbar-thumb {
+//   background: var(--scrollbar-hover-thumb-color);
+// }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--scrollbar-thumb-hover-color);
-}
+// ::-webkit-scrollbar-thumb:hover {
+//   background: var(--scrollbar-thumb-hover-color);
+// }
 
 .flex-center {
   display: flex;

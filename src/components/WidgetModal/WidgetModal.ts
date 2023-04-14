@@ -15,7 +15,8 @@ export default {
   },
   data() {
     return {
-      show: true
+      show: true,
+      fullscreen: false
     }
   },
   created() {

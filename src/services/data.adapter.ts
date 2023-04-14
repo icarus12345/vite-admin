@@ -47,10 +47,7 @@ export class DataAdapter {
     this.originalData = new Array();
     console.log('databind', setting)
     const params: any = {
-      page: setting.page,
-      pageSize: setting.pageSize,
-      filters: setting.filters,
-      sorts: setting.sorts,
+      ...setting
     }
     if (isFunction(this.source.loadServerData)) {
         console.log('Call LoadServerData')
