@@ -122,7 +122,7 @@ export default {
         },
         {
           title: '#',
-          slot: 'action',
+          type: 'action',
           width: 52,
           align: 'center',
           fixed: 'right',
@@ -138,7 +138,8 @@ export default {
                 alert(0)
               }
             })
-          }
+          },
+          
         }
       ],
       data: [],

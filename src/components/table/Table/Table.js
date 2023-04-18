@@ -2,7 +2,7 @@ import { getCurrentInstance, nextTick } from 'vue';
 import VTableHead from '../TableHead/TableHead.vue';
 import tableBody from 'view-ui-plus/src/components/table/table-body.vue';
 import tableSummary from 'view-ui-plus/src/components/table/summary.vue';
-import { Dropdown, DropdownMenu, Spin } from 'view-ui-plus';
+import { Dropdown, DropdownMenu, Spin, Button } from 'view-ui-plus';
 import { oneOf, getStyle, deepCopy } from 'view-ui-plus/src/utils/assist';
 import { on, off } from 'view-ui-plus/src/utils/dom';
 import random from 'view-ui-plus/src/utils/random_str';
@@ -203,12 +203,13 @@ export default {
         return {
             keyword: '',
             page: 1,
-            pageSize: 10,
+            pageSize: 20,
             pageSizeOpts: [10, 20, 50, 100, 200, 500],
             totalRecords: 0,
             data: [],
             ready: false,
             tableWidth: 0,
+            tableHeight: 0,
             columnsWidth: {},
             prefixCls: prefixCls,
             compiledUids: [],
@@ -239,7 +240,20 @@ export default {
             scrollOnTheRight: false,
             id: random(6),
             columnsState: {},
-            dataAdapter: new DataAdapter(this.source)
+            dataAdapter: new DataAdapter(this.source),
+            resizeObserver: new ResizeObserver(([entry]) => {
+                console.log(entry,'ResizeObserver::e')
+                console.log(entry.contentRect,'ResizeObserver::entry.contentRect')
+                
+                console.log(this.bodyHeight,'Table body height');
+                this.tableHeight = entry.contentRect.height - 48 - 40
+                this.handleResize();
+                // if (this.height) {
+                //     this.bodyHeight = this.height - titleHeight - headerHeight - footerHeight;
+                // } else if (this.maxHeight) {
+                //     this.bodyHeight = this.maxHeight - titleHeight - headerHeight - footerHeight;
+                // }
+            })
         };
     },
     computed: {
@@ -283,7 +297,7 @@ export default {
                     [`${prefixCls}-${this.size}`]: !!this.size,
                     [`${prefixCls}-border`]: this.border,
                     [`${prefixCls}-stripe`]: this.stripe,
-                    [`${prefixCls}-with-fixed-top`]: !!this.height
+                    [`${prefixCls}-with-fixed-top`]: !!this.tableHeight
                 }
             ];
         },
@@ -319,8 +333,8 @@ export default {
                 else if (this.size === 'large') summaryHeight = 60;
                 else summaryHeight = 48;
             }
-            if (this.height) {
-                let height = parseInt(this.height) + summaryHeight;
+            if (this.tableHeight) {
+                let height = parseInt(this.tableHeight) + summaryHeight;
                 style.height = `${height}px`;
             }
             if (this.maxHeight) {
@@ -388,7 +402,7 @@ export default {
             let style = {};
             if (this.bodyHeight !== 0) {
                 const height = this.bodyHeight;
-                if (this.height) {
+                if (this.tableHeight) {
                     style.height = `${height}px`;
                 } else if (this.maxHeight) {
                     style.maxHeight = `${height}px`;
@@ -401,7 +415,7 @@ export default {
             if (this.bodyHeight !== 0) {
                 let height = this.bodyHeight - (this.showHorizontalScrollBar?this.scrollBarWidth:0);
                 const bodyHeight = this.showHorizontalScrollBar ? `${height}px` : `${height - 1}px`;
-                if (this.height) style.height = bodyHeight;
+                if (this.tableHeight) style.height = bodyHeight;
                 else if (this.maxHeight) style.maxHeight = bodyHeight;
             }
             return style;
@@ -705,6 +719,7 @@ export default {
                 };
                 this.contextMenuStyles = position;
                 this.contextMenuVisible = true;
+
                 if (rowKey) {
                     this.$emit('on-contextmenu', JSON.parse(JSON.stringify(this.getBaseDataByRowKey(rowKey))), event, position);
                 } else {
@@ -800,7 +815,7 @@ export default {
             this.objData[_index]._isExpanded = status;
             this.$emit('on-expand', JSON.parse(JSON.stringify(this.cloneData[_index])), status);
 
-            if(this.height || this.maxHeight){
+            if(this.tableHeight || this.maxHeight){
                 nextTick(()=>this.fixedBody());
             }
         },
@@ -949,13 +964,13 @@ export default {
             }
         },
         fixedHeader () {
-            if (this.height || this.maxHeight) {
+            if (this.tableHeight || this.maxHeight) {
                 nextTick(() => {
                     const titleHeight = parseInt(getStyle(this.$refs.title, 'height')) || 0;
                     const headerHeight = parseInt(getStyle(this.$refs.header, 'height')) || 0;
                     const footerHeight = parseInt(getStyle(this.$refs.footer, 'height')) || 0;
-                    if (this.height) {
-                        this.bodyHeight = this.height - titleHeight - headerHeight - footerHeight;
+                    if (this.tableHeight) {
+                        this.bodyHeight = this.tableHeight - titleHeight - headerHeight - footerHeight;
                     } else if (this.maxHeight) {
                         this.bodyHeight = this.maxHeight - titleHeight - headerHeight - footerHeight;
                     }
@@ -1353,6 +1368,7 @@ export default {
             });
         },
         makeColumns (cols) {
+            const self = this;
             // 在 data 时，this.allColumns 暂时为 undefined
             let columns = deepCopy(getAllColumns(cols));
             let left = [];
@@ -1366,20 +1382,23 @@ export default {
                 column._width = column.width ? column.width : '';    // update in handleResize()
                 column._sortType = 'normal';
 
-
-                // column._filterChecked = [];
-
-                // if ('filterMultiple' in column) {
-                //     column._filterMultiple = column.filterMultiple;
-                // } else {
-                //     column._filterMultiple = true;
-                // }
-                // if ('filteredValue' in column) {
-                //     column._filterChecked = column.filteredValue;
-                //     column._isFiltered = true;
-                // }
-
-                
+                if(column.type === 'action') {
+                    column.render = (h, params) => {
+                        return h( Button, {
+                          type: 'text',
+                          icon: 'md-more',
+                          size: 'small',
+                        //   shape: 'square',
+                          onClick(event) {
+                            nextTick(() => {
+                                setTimeout(() => {
+                                    self.contextmenuCurrentRow(params.row._index, undefined, event)
+                                });
+                            })
+                          }
+                        })
+                    }
+                }
 
                 if (column.fixed && column.fixed === 'left') {
                     left.push(column);
@@ -1500,19 +1519,22 @@ export default {
             this.dataAdapter.dataBind(this.bindingSetting);
         });
 
-        on(window, 'resize', this.handleResize);
+        // on(window, 'resize', this.handleResize);
         this.observer = elementResizeDetectorMaker();
         this.observer.listenTo(this.$el, this.handleResize);
+
+        this.resizeObserver.observe(this.$el.parentElement);
     },
     beforeUnmount () {
         this.removeTable('TabsInstance');
         this.removeTable('ModalInstance');
         this.removeTable('DrawerInstance');
 
-        off(window, 'resize', this.handleResize);
+        // off(window, 'resize', this.handleResize);
         this.observer.removeAllListeners(this.$el);
         this.observer.uninstall(this.$el);
         this.observer = null;
+        this.resizeObserver.unobserve(this.$el.parentElement);
     },
     watch: {
         source: {

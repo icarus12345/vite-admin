@@ -16,18 +16,21 @@ export default {
   data() {
     return {
       show: true,
-      fullscreen: false
+      fullscreen: false,
+      
     }
   },
   created() {
-    this.$emit('open')
+    this.$emit('open');
+  },
+  mounted () {
   },
   methods: {
     onVisibleChange() {
-      console.log('onVisibleChange')
+      this.$emit('close')
     },
     onOk() {
-      this.$emit('oK')
+      this.$emit('ok')
     },
     onBack() {
       this.$emit('back')

@@ -8,7 +8,7 @@
     :fullscreen="fullscreen"
     ok-text="OK"
     cancel-text="Cancel"
-    width="600"
+    width="768"
     @on-ok="onOk"
     @on-cancel="onCancel"
     @on-visible-change="onVisibleChange"

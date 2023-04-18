@@ -20,6 +20,7 @@ Modal.widget = (props: any = {}) => {
     render() {
       // render content
       let bodyRender: any;
+      let self = this;
       if (this.render) {
         bodyRender = this.render(h);
       } else if (this.component) {
@@ -44,12 +45,17 @@ Modal.widget = (props: any = {}) => {
           },
           onClose() {
             console.log('CLOSE')
+            self.remove();
           },
-          onCancel: this.onCancel,
+          onCancel() {
+            console.log('CANCEL')
+            // self.remove();
+          },
           onOk() {
             console.log('OK')
+            // self.remove();
           },
-          onSelectionChange(items) {
+          onSelectionChange(items: any) {
             console.log(items,'ITEMS')
           }
         },
@@ -86,6 +92,7 @@ Modal.widget = (props: any = {}) => {
         Instance.unmount();
         document.body.removeChild(container);
         this.onRemove();
+        console.log('DESTROY')
       },
       onOk() { },
       onCancel() { },
