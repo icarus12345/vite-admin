@@ -19,7 +19,7 @@
                         </template>
                         <template v-else-if="column.type === 'selection'"><Checkbox v-if="!column.hideSelectAll" :model-value="isSelectAll" :disabled="isSelectDisabled" @on-change="selectAll"></Checkbox></template>
                         <template v-else-if="column.type === 'action'">
-                            <render-header :render="column.renderHeader" :column="column" :index="index"></render-header>
+                            <render-header v-if="column.renderHeader" :render="column.renderHeader" :column="column" :index="index"></render-header>
                         </template>
                         <template v-else>
                             <span v-if="!column.renderHeader" :class="{[prefixCls + '-cell-sort']: columnsState[column.key] && columnsState[column.key].sortable}" @click="handleSortByHead(column)">{{ column.title || '#' }}</span>

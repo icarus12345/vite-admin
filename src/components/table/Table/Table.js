@@ -2,7 +2,7 @@ import { getCurrentInstance, nextTick } from 'vue';
 import VTableHead from '../TableHead/TableHead.vue';
 import tableBody from 'view-ui-plus/src/components/table/table-body.vue';
 import tableSummary from 'view-ui-plus/src/components/table/summary.vue';
-import { Dropdown, DropdownMenu, Spin, Button } from 'view-ui-plus';
+import { Dropdown, DropdownMenu, Spin, Button, ButtonGroup } from 'view-ui-plus';
 import { oneOf, getStyle, deepCopy } from 'view-ui-plus/src/utils/assist';
 import { on, off } from 'view-ui-plus/src/utils/dom';
 import random from 'view-ui-plus/src/utils/random_str';
@@ -25,7 +25,7 @@ let columnKey = 1;
 export default {
     name: 'VTable',
     mixins: [ Locale ],
-    components: { VTableHead, tableBody, tableSummary, Spin, Dropdown, DropdownMenu },
+    components: { VTableHead, tableBody, tableSummary, Spin, Dropdown, DropdownMenu, ButtonGroup, Button },
     emits: ['on-current-change', 'on-row-click', 'on-row-dblclick', 'on-contextmenu', 'on-select', 'on-select-cancel', 'on-selection-change', 'on-expand', 'on-expand-tree', 'on-select-all', 'on-select-all-cancel', 'on-sort-change', 'on-filter-change', 'on-drag-drop', 'on-cell-click', 'on-column-width-resize'],
     provide () {
         return {
@@ -489,7 +489,7 @@ export default {
                 .omitBy((state, key) => {
                     return !state.sortType;
                 })
-                .map((state, key) => state.filterValue.map(d => [key, state.sortType]))
+                .map((state, key) => [key, state.sortType])
                 .value()
         },
         filterConditions() {
@@ -798,6 +798,7 @@ export default {
 
             data._isChecked = status;
             const selection = this.getSelection();
+            console.log(selection,'selection')
             const selectedData = rowKey ? this.getBaseDataByRowKey(rowKey, this.data) : this.data[_index];
             this.$emit(status ? 'on-select' : 'on-select-cancel', selection, JSON.parse(JSON.stringify(selectedData)));
             this.$emit('on-selection-change', selection);
@@ -1153,7 +1154,6 @@ export default {
             // } else {
             //     this.rebuildData = this.sortData(this.rebuildData, order, index);
             // }
-
             this.$emit('on-sort-change', {
                 column: JSON.parse(JSON.stringify(this.allColumns[this.cloneColumns[index]._index])),
                 key,
@@ -1206,6 +1206,9 @@ export default {
                 column,
                 columnsState
             });
+        },
+        refresh() {
+            this.dataAdapter.dataBind(this.bindingSetting);
         },
         /**
          * #2832

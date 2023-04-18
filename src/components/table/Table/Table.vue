@@ -1,7 +1,18 @@
 <template>
     <div class="v-table">
-        <div class="ivu-table-quick-filter">
+        <div class="ivu-table-quick-action">
             <Input placeholder="Search" style="width: auto" search @on-search="handleSearch" v-model="keyword"></Input>
+            <Tooltip content="Add new entry">
+                <Button icon="md-add" type="text"></Button>
+            </Tooltip>
+            <Tooltip :content="`Remove ${getSelection().length} selected item(s)`">
+                <Button icon="md-trash" type="text" :disabled="!getSelection().length"></Button>
+            </Tooltip>
+            <Tooltip content="Refresh">
+                <Button icon="md-refresh" type="text" @click="refresh()"></Button>
+            </Tooltip>
+            <Divider type="vertical"/>
+            <Button icon="md-more" type="text"></Button>
         </div>
         <div :class="wrapClasses" :style="styles" ref="tableWrap">
             <div :class="classes">

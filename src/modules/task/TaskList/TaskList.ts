@@ -88,7 +88,8 @@ export default {
           title: 'Status',
           slot: 'status',
           key: 'status',
-          width: 80,
+          width: 84,
+          sortable: true,
           filterable: true,
           filterType: 'list',
           filters: [
@@ -113,6 +114,7 @@ export default {
           title: 'Create Date',
           key: 'create_date',
           width: 120,
+          sortable: true,
           filterable: true,
           filterType: 'date',
           
@@ -128,17 +130,17 @@ export default {
           fixed: 'right',
           sticky: 'right',
           className: 'ivu-table-column-action',
-          renderHeader(h, params) {
-            return h( Button, {
-              type: 'text',
-              icon: 'md-add',
-              size: 'small',
-              shape: 'square',
-              onClick() {
-                alert(0)
-              }
-            })
-          },
+          // renderHeader(h, params) {
+          //   return h( Button, {
+          //     type: 'text',
+          //     icon: 'md-add',
+          //     size: 'small',
+          //     shape: 'square',
+          //     onClick() {
+          //       alert(0)
+          //     }
+          //   })
+          // },
           
         }
       ],

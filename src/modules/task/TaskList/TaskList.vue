@@ -20,7 +20,7 @@
       <small>{{ row.user.email }}</small>
     </template>
     <template #status="{ row }">
-      <Checkbox v-model="row.completed" class="pe-none"></Checkbox>
+      <Switch size="small" v-model="row.completed" class="pe-none"/>
     </template>
     <template #contextMenu>
       <DropdownItem><Icon type="md-add" size="16"/> Add New</DropdownItem>

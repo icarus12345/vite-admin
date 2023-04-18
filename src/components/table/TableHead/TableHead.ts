@@ -242,18 +242,6 @@ export default {
             state.filterVisible = false
             this.$parent.handleFilter(column.key, this.columnsState);
         },
-        handleFilterText(column) {
-
-        },
-        handleFilterList(column) {
-            
-        },
-        handleFilterCheckList(column) {
-            
-        },
-        handleFilterDate(column) {
-            
-        },
         handleSelect (column, value) {
             const state = this.columnsState[column.key];
             state.filterValue[0][1] = value;

@@ -45,7 +45,6 @@ export class DataAdapter {
     this.page = setting.page || 0;
     this.cachedRecords = setting.cachedRecords || new Array();
     this.originalData = new Array();
-    console.log('databind', setting)
     const params: any = {
       ...setting
     }
