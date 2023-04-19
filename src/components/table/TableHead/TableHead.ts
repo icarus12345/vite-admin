@@ -23,7 +23,8 @@ export default {
             default: false
         },
         columnRows: Array,
-        fixedColumnRows: Array
+        fixedColumnRows: Array,
+        selection: Selection
     },
     data () {
         return {
@@ -131,6 +132,21 @@ export default {
 
             return isSelectAll;
         },
+        isUnSelectAll () {
+            let isAllDisabledAndUnSelected = true;
+
+            for (let i in this.objData) {
+                const objData = this.objData[i];
+                
+                if (!(objData._isDisabled && !objData._isChecked)) {
+                    isAllDisabledAndUnSelected = false;
+                } else if (objData.children && objData.children.length) {
+                    isAllDisabledAndUnSelected = !this.isChildrenAllDisabledAndUnSelected(objData, isAllDisabledAndUnSelected);
+                }
+            }
+
+            return isAllDisabledAndUnSelected;
+        },
         headRows () {
             let hRows;
             const isGroup = this.columnRows.length > 1;
@@ -208,9 +224,8 @@ export default {
                 }
             ];
         },
-        selectAll () {
-            const status = !this.isSelectAll;
-            this.$parent.selectAll(status);
+        toggleAll () {
+            this.$parent.toggleAll();
         },
         handleSort (column, type) {
             const state = this.columnsState[column.key];
@@ -414,6 +429,6 @@ export default {
                 });
             }
             return status;
-        }
+        },
     }
 };

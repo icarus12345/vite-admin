@@ -4,7 +4,6 @@ import tableBody from 'view-ui-plus/src/components/table/table-body.vue';
 import tableSummary from 'view-ui-plus/src/components/table/summary.vue';
 import { Dropdown, DropdownMenu, Spin, Button, ButtonGroup } from 'view-ui-plus';
 import { oneOf, getStyle, deepCopy } from 'view-ui-plus/src/utils/assist';
-import { on, off } from 'view-ui-plus/src/utils/dom';
 import random from 'view-ui-plus/src/utils/random_str';
 import Csv from 'view-ui-plus/src/utils/csv';
 import ExportCsv from 'view-ui-plus/src/components/table';
@@ -14,6 +13,7 @@ import { getAllColumns, convertToRows, convertColumnOrder, getRandomStr } from '
 import LD, { isObject, isArray } from 'lodash';
 import { getScrollBarSize } from '@/utils'
 import { DataAdapter } from '@/services'
+import { Selection } from '@/utils';
 
 const prefixCls = 'ivu-table';
 
@@ -51,7 +51,7 @@ export default {
         //     }
         // },
         source: {
-            type: Object,
+            type: Object || Array,
             default () {
                 return {
                     url: '',
@@ -241,18 +241,10 @@ export default {
             id: random(6),
             columnsState: {},
             dataAdapter: new DataAdapter(this.source),
+            selection: new Selection(),
             resizeObserver: new ResizeObserver(([entry]) => {
-                console.log(entry,'ResizeObserver::e')
-                console.log(entry.contentRect,'ResizeObserver::entry.contentRect')
-                
-                console.log(this.bodyHeight,'Table body height');
-                this.tableHeight = entry.contentRect.height - 48 - 40
+                this.tableHeight = entry.contentRect.height - 48 - 40; // content height - quick filter - paging
                 this.handleResize();
-                // if (this.height) {
-                //     this.bodyHeight = this.height - titleHeight - headerHeight - footerHeight;
-                // } else if (this.maxHeight) {
-                //     this.bodyHeight = this.maxHeight - titleHeight - headerHeight - footerHeight;
-                // }
             })
         };
     },
@@ -489,7 +481,7 @@ export default {
                 .omitBy((state, key) => {
                     return !state.sortType;
                 })
-                .map((state, key) => [key, state.sortType])
+                .map((state, key) => ({column: key, dir: state.sortType }))
                 .value()
         },
         filterConditions() {
@@ -926,6 +918,9 @@ export default {
             }
             return data;
         },
+        toggleAll () {
+            // const ids = this.rebuildData
+        },
         selectAll (status) {
             // this.rebuildData.forEach((data) => {
             //     if(this.objData[data._index]._isDisabled){
@@ -1073,87 +1068,11 @@ export default {
                 $body.scrollLeft = $body.scrollLeft - 10;
             }
         },
-        sortData (data, type, index) {
-            const key = this.cloneColumns[index].key;
-            data.sort((a, b) => {
-                if (this.cloneColumns[index].sortMethod) {
-                    return this.cloneColumns[index].sortMethod(a[key], b[key], type);
-                } else {
-                    if (type === 'asc') {
-                        return a[key] > b[key] ? 1 : -1;
-                    } else if (type === 'desc') {
-                        return a[key] < b[key] ? 1 : -1;
-                    }
-                }
-            });
-            for (let i = 0; i < data.length; i++) {
-                if (data[i].children && data[i].children.length) {
-                    data[i].children = this.sortData(data[i].children, type, index);
-                }
-            }
-            return data;
-        },
-        makeDataWithSortAndFilter2() {
-            console.log('makeDataWithSortAndFilter2')
-            const data = this.makeData()
-                .filter((row) => {
-                    return this.filterConditions
-                        .some(([key, operator, value]) => {
-                            const index = this.GetOriginalByKey(key);
-                            const column = this.cloneColumns[index];
-                            if (column.filterMethod) {
-                                return column.filterMethod(row, operator, value)
-                            }
-                            const rowValue = LD.get(row, column.map || column.key);
-                            switch(operator) {
-                                case 'STARTS_WITH':
-                                    return rowValue && rowValue.toLowerCase().startsWith(value.toLowerCase());
-                                case 'END_WITH':
-                                    return rowValue && rowValue.toLowerCase().endsWith(value.toLowerCase());
-                                case 'EQUAL':
-                                    return rowValue && rowValue.toLowerCase() === value.toLowerCase();
-                                case 'NOT_EQUAL':
-                                    return !(rowValue && rowValue.toLowerCase() === value.toLowerCase());
-                                case 'DOES_NOT_CONTAIN':
-                                    return !(rowValue && rowValue.toLowerCase().includes(value.toLowerCase()));
-                                case 'NULL':
-                                    return (!rowValue || rowValue.length === 0)
-                                case 'NOT_NULL':
-                                    return !(!rowValue || rowValue.length === 0)
-                                case 'LESS_THAN':
-                                    return +rowValue < +value
-                                case 'LESS_THAN_OR_EQUAL':
-                                    return +rowValue <= +value
-                                case 'GREATER_THAN':
-                                    return +rowValue > +value
-                                case 'GREATER_THAN_OR_EQUAL':
-                                    return +rowValue >= +value
-                                case 'IN':
-                                    return value.includes(rowValue)
-                                case 'CONTAINS':
-                                default:
-                                    return rowValue && rowValue.toLowerCase().includes(value.toLowerCase());
-                            }
-                        })
-                })
-            console.log(this.sortBy, 'sortBy')
-            // sort
-            return data;
-        },
-        filterData2 (data, condition) {
-
-        },
         handleSort (key, columnsState) {
             this.columnsState = columnsState
             const index = this.GetOriginalByKey(key);
             const order = columnsState[key].sortType;
-            // Server side
             this.dataAdapter.dataBind(this.bindingSetting);
-            // if (!order) {
-            //     this.rebuildData = this.makeDataWithFilter();
-            // } else {
-            //     this.rebuildData = this.sortData(this.rebuildData, order, index);
-            // }
             this.$emit('on-sort-change', {
                 column: JSON.parse(JSON.stringify(this.allColumns[this.cloneColumns[index]._index])),
                 key,
@@ -1194,13 +1113,8 @@ export default {
             const index = this.GetOriginalByKey(key);
             this.columnsState = columnsState
             const column = this.cloneColumns[index];
-            // Server side
             this.page = 1;
             this.dataAdapter.dataBind(this.bindingSetting);
-            // let filterData = this.makeDataWithSort();
-            // filter others first, after filter this column
-            // filterData = this.filterOtherData(filterData, index);
-            // this.rebuildData = this.makeDataWithSortAndFilter2();
 
             this.$emit('on-filter-change', {
                 column,
@@ -1229,16 +1143,8 @@ export default {
         },
         handleFilterReset (key) {
             const index = this.GetOriginalByKey(key);
-            // this.cloneColumns[index]._isFiltered = false;
-            // this.cloneColumns[index]._filterVisible = false;
-            // this.cloneColumns[index]._filterChecked = [];
-
             this.page = 1;
             this.dataAdapter.dataBind(this.bindingSetting);
-
-            // let filterData = this.makeDataWithSort();
-            // filterData = this.filterOtherData(filterData, index);
-            // this.rebuildData = filterData;
             this.$emit('on-filter-change', this.cloneColumns[index]);
         },
         makeData () {
@@ -1266,33 +1172,6 @@ export default {
             } else {
                 return data;
             }
-        },
-        makeDataWithSort () {
-            let data = this.makeData();
-            let sortType = 'normal';
-            let sortIndex = -1;
-            let isCustom = false;
-
-            for (let i = 0; i < this.cloneColumns.length; i++) {
-                if (this.cloneColumns[i]._sortType !== 'normal') {
-                    sortType = this.cloneColumns[i]._sortType;
-                    sortIndex = i;
-                    isCustom = this.cloneColumns[i].sortable === 'custom';
-                    break;
-                }
-            }
-            if (sortType !== 'normal' && !isCustom) data =  this.sortData(data, sortType, sortIndex);
-            return data;
-        },
-        makeDataWithFilter () {
-            let data = this.makeData();
-            this.cloneColumns.forEach(col => data = this.filterData(data, col));
-            return data;
-        },
-        makeDataWithSortAndFilter () {
-            let data = this.makeDataWithSort();
-            this.cloneColumns.forEach(col => data = this.filterData(data, col));
-            return data;
         },
         makeObjBaseData (row) {
             const newRow = deepCopy(row);
@@ -1495,7 +1374,6 @@ export default {
         if (!this.context) this.currentContext = this.$parent;
         this.showSlotHeader = this.$slots.header !== undefined;
         this.showSlotFooter = this.$slots.footer !== undefined;
-        this.rebuildData = this.makeDataWithSortAndFilter();
         // INIT
         this.dataAdapter.bind$.subscribe((resource) => {
             if (isArray(resource)) {
@@ -1508,7 +1386,7 @@ export default {
             this.objData = this.makeObjData();
             this.rebuildData = this.makeData();
             this.cloneData = deepCopy(this.data);
-           nextTick(()=>this.fixedHeader());
+            nextTick(()=>this.fixedHeader());
         })
     },
     mounted () {
@@ -1543,18 +1421,8 @@ export default {
         source: {
             handler () {
                 if (isArray(this.source)) {
-                    this.data = this.source;
-                    const oldDataLen = this.rebuildData.length;
-                    this.objData = this.makeObjData();
-                    this.rebuildData = this.makeDataWithSortAndFilter();
-                    this.handleResize();
-                    if (!oldDataLen) {
-                        this.fixedHeader();
-                    }
-                    // here will trigger before clickCurrentRow, so use async
-                    setTimeout(() => {
-                        this.cloneData = deepCopy(this.data);
-                    }, 0);
+                    this.dataAdapter.cachedRecords = this.source;
+                    this.dataAdapter.dataBind(this.bindingSetting);
                 }
             },
             deep: true
@@ -1569,7 +1437,7 @@ export default {
                 this.columnRows = this.makeColumnRows(false, colsWithId);
                 this.leftFixedColumnRows = this.makeColumnRows('left', colsWithId);
                 this.rightFixedColumnRows = this.makeColumnRows('right', colsWithId);
-                this.rebuildData = this.makeDataWithSortAndFilter();
+                // Todo: rebuild data.
                 this.handleResize();
             },
             deep: true

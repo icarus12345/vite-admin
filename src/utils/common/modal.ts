@@ -21,9 +21,10 @@ Modal.widget = (props: any = {}) => {
       // render content
       let bodyRender: any;
       let self = this;
-      if (this.render) {
-        bodyRender = this.render(h);
-      } else if (this.component) {
+      // if (this.render) {
+      //   bodyRender = this.render(h);
+      // } else 
+      if (this.component) {
         bodyRender = h(this.component, {
           onSelectionChange(items) {
             console.log(items,'ITEMS')
@@ -69,7 +70,7 @@ Modal.widget = (props: any = {}) => {
       cancel() {
         if (this.closing) return;
         this.buttonLoading = false;
-        this.onCancel();
+        // this.onCancel();
         this.remove();
       },
       ok() {
@@ -79,7 +80,7 @@ Modal.widget = (props: any = {}) => {
         } else {
           this.remove();
         }
-        this.onOk();
+        // this.onOk();
       },
       remove() {
         this.closing = true;
@@ -91,12 +92,12 @@ Modal.widget = (props: any = {}) => {
       destroy() {
         Instance.unmount();
         document.body.removeChild(container);
-        this.onRemove();
+        // this.onRemove();
         console.log('DESTROY')
       },
-      onOk() { },
-      onCancel() { },
-      onRemove() { }
+      // onOk() { },
+      // onCancel() { },
+      // onRemove() { }
     },
     created() {
     }

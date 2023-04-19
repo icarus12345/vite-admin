@@ -44,9 +44,6 @@ export default {
           minWidth: 160,
           filterable: true,
           filterType: 'string', // list, string , checkedList, date, number, custom, range
-          filterRender() {
-
-          },
           // filterMethod(row, operator, value) {
           //   return row.title.include(value);
           // }
@@ -54,8 +51,8 @@ export default {
         {
           title: 'User',
           slot: 'user',
-          key: 'user',
-          map: 'user.name',
+          key: 'user.name',
+          // map: 'user.name',
           width: 160,
           sortable: true,
           sortMethod(a, b, type) {
@@ -86,8 +83,8 @@ export default {
         },
         {
           title: 'Status',
-          slot: 'status',
-          key: 'status',
+          slot: 'completed',
+          key: 'completed',
           width: 84,
           sortable: true,
           filterable: true,
@@ -189,7 +186,7 @@ export default {
           finalize(() => (this.loading = false))
         )
         .subscribe((tasks) => {
-          // this.data = tasks
+          this.data = tasks
         })
     },
     sortChange(event: any) {

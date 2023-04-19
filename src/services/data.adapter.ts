@@ -2,60 +2,98 @@ import { AxiosRequestConfig } from "axios";
 import { AxiosObservable } from "axios-observable";
 import { Observable, Subject, finalize, map, of, share } from "rxjs";
 import { $Axios } from "./request";
-import { isFunction } from "../utils/common/typeof";
-import { cloneDeep } from 'lodash';
+import { isArray, isFunction } from "../utils/common/typeof";
+import LD from 'lodash';
 
 export class DataAdapter {
   bind$: Subject<any> = new Subject();
   loading: boolean = false;
   cache: boolean = false;
   async: boolean = false;
-  source: any;
-  setting: any;
-  records: any = new Array();
-  originalData: any = new Array();
-  cachedRecords: any = new Array();
+  source: any = {};
+  cachedRecords: any;
   totalRecords: number = 0;
   pageSize: number = 0;
   page: number = 0;
   pageable: boolean = false;
-  constructor(source: any = {}, setting: any = {}) {
-    this.source = source;
-    this.setting = setting;
+  constructor(source: any = {}) {
+    if(isArray(source)) {
+      this.cachedRecords = LD.cloneDeep(source);
+      this.totalRecords = source.length;
+    } else {
+      this.source = source;
+    }
   }
 
-  filterData() {
-    return 
+  makeData(setting: any) {
+    const sorts = setting.sorts;
+    const filters = setting.filters;
+    const columns = LD.chain(sorts).map('column').value();
+    const dirs = LD.chain(sorts).map('dir').value();
+    return LD.chain(this.cachedRecords)
+      .filter((row) => filters.every(([column, operator, value]: any) => {
+          // if (column.filterMethod) {
+          //     return column.filterMethod(row, operator, value)
+          // }
+          const rowValue = LD.get(row, column);
+          switch(operator) {
+              case 'STARTS_WITH':
+                  return LD.startsWith(rowValue, value);
+              case 'END_WITH':
+                  return LD.endsWith(rowValue, value);
+              case 'EQUAL':
+                  return LD.isEqual(rowValue, value);
+              case 'NOT_EQUAL':
+                  return !LD.isEqual(rowValue, value);
+              case 'DOES_NOT_CONTAIN':
+                  return !LD.includes(rowValue, value);
+              case 'NULL':
+                  return (!rowValue || rowValue.length === 0)
+              case 'NOT_NULL':
+                  return !(!rowValue || rowValue.length === 0)
+              case 'LESS_THAN':
+                  return +rowValue < +value
+              case 'LESS_THAN_OR_EQUAL':
+                  return +rowValue <= +value
+              case 'GREATER_THAN':
+                  return +rowValue > +value
+              case 'GREATER_THAN_OR_EQUAL':
+                  return +rowValue >= +value
+              case 'IN':
+                  return value.includes(rowValue)
+              case 'CONTAINS':
+              default:
+                  return LD.includes(rowValue, value);
+          }
+        })
+      )
+      .orderBy(columns, dirs)
+      .value();
   }
 
-  sortData() {
-
+  paging(records: any) {
+    const offset = Math.max(0, this.page - 1) * this.pageSize;
+    return records.slice(offset, offset + this.pageSize);
   }
 
   dataBind(setting: any) {
     if (this.loading == true) {
       return;
     }
-    this.records = new Array();
     // this.totalRecords = setting.totalRecords || 0;
     // this.cache = !!setting.cache;
     // this.async = !!setting.async;
     this.pageable = !!setting.pageable;
     this.pageSize = setting.pageSize || 0;
     this.page = setting.page || 0;
-    this.cachedRecords = setting.cachedRecords || new Array();
-    this.originalData = new Array();
     const params: any = {
       ...setting
     }
     if (isFunction(this.source.loadServerData)) {
         console.log('Call LoadServerData')
     } else if (this.source.url) {
-      console.log('Call ServerData')
       if (isFunction(this.source.beforeSend)) {
-        console.log('Call BeforeSend')
         this.source.beforeSend(params);
-        console.log(params)
       }
       this.loading = true;
       $Axios.get(this.source.url, {
@@ -69,11 +107,14 @@ export class DataAdapter {
         share()
       )
       .subscribe((resource: any) => {
-        this.emitParser(cloneDeep(resource));
+        this.emitParser(LD.cloneDeep(resource));
       })
-    } else if (this.source.records) {
-      console.log('Call LocalData')
-      this.emitParser(cloneDeep(this.source.records));
+    } else if(this.cachedRecords) {
+      const records = this.makeData(setting);
+      this.emitParser({
+          records: this.paging(records),
+          totalRecords: records.length
+      });
     }
   }
 

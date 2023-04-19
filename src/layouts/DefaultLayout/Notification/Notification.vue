@@ -12,7 +12,7 @@
         <List>
         <template #header>
           <div>Notifications</div>
-          <Text type="help" italic>You have 4 unread Notifications</Text>
+          <Text italic>You have 4 unread Notifications</Text>
         </template>
         <ListItem>
           <ListItemMeta avatar="https://dev-file.iviewui.com/userinfoPDvn9gKWYihR24SpgC319vXY8qniCqj4/avatar" title="This is title" description="This is description, this is description." />

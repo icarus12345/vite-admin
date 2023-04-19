@@ -1,9 +1,8 @@
 <template>
   <VTable ref="selection" 
     :columns="columns" 
-    :data="data" 
     :loading="loading"
-    :source="dataSource"
+    :source="data"
     size="small"
     fixed-shadow="auto"
     @on-sort-change="sortChange"
@@ -19,7 +18,7 @@
       <div>{{ row.user.name }}</div>
       <small>{{ row.user.email }}</small>
     </template>
-    <template #status="{ row }">
+    <template #completed="{ row }">
       <Switch size="small" v-model="row.completed" class="pe-none"/>
     </template>
     <template #contextMenu>

@@ -9,7 +9,7 @@
           </Badge>
           <div class="vstack">
             Teri Dactyl
-            <Text type="help" class="small">Premium Member</Text>
+            <Text class="small">Premium Member</Text>
           </div>
         </div>
         <DropdownItem divided>View Profile</DropdownItem>

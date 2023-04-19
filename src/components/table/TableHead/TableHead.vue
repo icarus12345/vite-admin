@@ -17,7 +17,7 @@
                             <span v-if="!column.renderHeader">{{ column.title || '' }}</span>
                             <render-header v-else :render="column.renderHeader" :column="column" :index="index"></render-header>
                         </template>
-                        <template v-else-if="column.type === 'selection'"><Checkbox v-if="!column.hideSelectAll" :model-value="isSelectAll" :disabled="isSelectDisabled" @on-change="selectAll"></Checkbox></template>
+                        <template v-else-if="column.type === 'selection'"><Checkbox v-if="!column.hideSelectAll" :model-value="isSelectAll" :disabled="isSelectDisabled" @on-change="toggleAll" :indeterminate="!isSelectAll && !isUnSelectAll"></Checkbox></template>
                         <template v-else-if="column.type === 'action'">
                             <render-header v-if="column.renderHeader" :render="column.renderHeader" :column="column" :index="index"></render-header>
                         </template>
@@ -49,17 +49,17 @@
                                                   <Option v-for="(label, cond) in conditions[columnsState[column.key].filterType]" :value="cond">{{ label }}</Option>
                                               </Select>
                                           </div>
-                                        <DatePicker type="date" placeholder="Select date" style="width: 200px" v-model="columnsState[column.key].filterValue[0][1]"></DatePicker>
+                                        <DatePicker type="date" placeholder="Select date" style="width: 200px" v-model="columnsState[column.key].filterValue[0][1]" :disabled="['NULL', 'NOT_NULL'].includes(columnsState[column.key].filterValue[0][0])"></DatePicker>
                                         <Divider size="small"/>
                                         <div class="mb-2">
                                               <Select v-model="columnsState[column.key].filterValue[1][0]" :transfer="true" size="small" style="width: 120px">
                                                   <Option v-for="(label, cond) in conditions[columnsState[column.key].filterType]" :value="cond">{{ label }}</Option>
                                               </Select>
                                           </div>
-                                        <DatePicker type="date" placeholder="Select date" style="width: 200px" v-model="columnsState[column.key].filterValue[1][1]"></DatePicker>
+                                        <DatePicker type="date" placeholder="Select date" style="width: 200px" v-model="columnsState[column.key].filterValue[1][1]" :disabled="['NULL', 'NOT_NULL'].includes(columnsState[column.key].filterValue[1][0])"></DatePicker>
                                       </div>
                                       <div :class="[prefixCls + '-filter-footer']">
-                                          <Button type="text" size="small" :disabled="!columnsState[column.key].filterValue" @click="handleFilter(column)">{{ t('i.table.confirmFilter') }}</Button>
+                                          <Button type="text" size="small" @click="handleFilter(column)" :disabled="!['NULL', 'NOT_NULL'].includes(columnsState[column.key].filterValue[0][0]) && !['NULL', 'NOT_NULL'].includes(columnsState[column.key].filterValue[1][0]) && !columnsState[column.key].filterValue[0][1] && !columnsState[column.key].filterValue[1][1]">{{ t('i.table.confirmFilter') }}</Button>
                                           <Button type="text" size="small" @click="handleReset(column);">{{ t('i.table.resetFilter') }}</Button>
                                       </div>
                                   </div>
@@ -100,11 +100,10 @@
                                                         <Option v-for="(label, cond) in conditions[columnsState[column.key].filterType]" :value="cond">{{ label }}</Option>
                                                     </Select>
                                                 </div>
-                                                <Input placeholder="Search" style="width: 160px" v-model="columnsState[column.key].filterValue[0][1]">
-                                                </Input>
+                                                <Input placeholder="Search" style="width: 160px" v-model="columnsState[column.key].filterValue[0][1]" :disabled="['NULL', 'NOT_NULL'].includes(columnsState[column.key].filterValue[0][0])" autofocus></Input>
                                             </div>
                                             <div :class="[prefixCls + '-filter-footer']">
-                                                <Button type="text" size="small" :disabled="!columnsState[column.key].filterValue[0][1]" @click="handleFilter(column)">{{ t('i.table.confirmFilter') }}</Button>
+                                                <Button type="text" size="small" :disabled="!['NULL', 'NOT_NULL'].includes(columnsState[column.key].filterValue[0][0]) && !columnsState[column.key].filterValue[0][1]" @click="handleFilter(column)">{{ t('i.table.confirmFilter') }}</Button>
                                                 <Button type="text" size="small" @click="handleReset(column);">{{ t('i.table.resetFilter') }}</Button>
                                             </div>
                                         </div>

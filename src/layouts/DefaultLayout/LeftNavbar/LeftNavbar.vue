@@ -5,7 +5,7 @@
     <template #content><div>Logout</div></template>
   </PageHeader>
   <Menu theme="light" width="auto" :active-name="activeRoute">
-    <Submenu :active-name="activeRoute">
+    <Submenu :active-name="activeRoute" name="1">
       <template #title>
         <Icon type="ios-warning-outline" />
         Error page
