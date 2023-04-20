@@ -17,7 +17,7 @@
                             <span v-if="!column.renderHeader">{{ column.title || '' }}</span>
                             <render-header v-else :render="column.renderHeader" :column="column" :index="index"></render-header>
                         </template>
-                        <template v-else-if="column.type === 'selection'"><Checkbox v-if="!column.hideSelectAll" :model-value="isSelectAll" :disabled="isSelectDisabled" @on-change="toggleAll" :indeterminate="!isSelectAll && !isUnSelectAll"></Checkbox></template>
+                        <template v-else-if="column.type === 'selection'"><Checkbox v-if="!column.hideSelectAll" :model-value="isSelectAll" :disabled="isSelectDisabled" @on-change="selectAll" :indeterminate="!isSelectAll && !isUnSelectAll"></Checkbox></template>
                         <template v-else-if="column.type === 'action'">
                             <render-header v-if="column.renderHeader" :render="column.renderHeader" :column="column" :index="index"></render-header>
                         </template>

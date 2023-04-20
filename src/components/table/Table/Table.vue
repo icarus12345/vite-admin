@@ -24,6 +24,7 @@
                         :columns="cloneColumns"
                         :column-rows="columnRows"
                         :obj-data="objData"
+                        :selection="selection"
                         :columns-width="columnsWidth"
                         :data="rebuildData"></VTableHead>
                 </div>
@@ -73,6 +74,7 @@
                             :column-rows="columnRows"
                             :fixed-column-rows="leftFixedColumnRows"
                             :obj-data="objData"
+                            :selection="selection"
                             :columns-width="columnsWidth"
                             :data="rebuildData"></VTableHead>
                     </div>
@@ -110,6 +112,7 @@
                             :fixed-column-rows="rightFixedColumnRows"
                             :obj-data="objData"
                             :columns-width="columnsWidth"
+                            :selection="selection"
                             :data="rebuildData"></VTableHead>
                     </div>
                     <div :class="[prefixCls + '-fixed-body']" :style="fixedBodyStyle" ref="fixedRightBody" @mousewheel="handleFixedMousewheel" @DOMMouseScroll="handleFixedMousewheel">

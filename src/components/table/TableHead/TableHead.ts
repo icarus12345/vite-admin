@@ -6,6 +6,7 @@ import renderHeader from 'view-ui-plus/src/components/table/header';
 import Mixin from '../mixin';
 import Locale from 'view-ui-plus/src/mixins/locale';
 import { isClient } from 'view-ui-plus/src/utils/index';
+import { Selection } from '@/utils';
 
 export default {
     name: 'VTableHead',
@@ -98,7 +99,12 @@ export default {
                     sortType
                 }
             })
-            
+        this.selection.changed.subscribe((d) => {
+            console.log(d,'selection::changed')
+        })
+    },
+    mounted() {
+
     },
     computed: {
         styles () {
@@ -134,17 +140,15 @@ export default {
         },
         isUnSelectAll () {
             let isAllDisabledAndUnSelected = true;
-
+            
             for (let i in this.objData) {
                 const objData = this.objData[i];
-                
-                if (!(objData._isDisabled && !objData._isChecked)) {
+                if (objData._isChecked) {
                     isAllDisabledAndUnSelected = false;
                 } else if (objData.children && objData.children.length) {
                     isAllDisabledAndUnSelected = !this.isChildrenAllDisabledAndUnSelected(objData, isAllDisabledAndUnSelected);
                 }
             }
-
             return isAllDisabledAndUnSelected;
         },
         headRows () {
@@ -179,9 +183,10 @@ export default {
                 }
             }
             return isSelectDisabled;
-        }
+        },
     },
     methods: {
+        
         cellClasses (column) {
             return [
                 `${this.prefixCls}-cell`,
@@ -224,8 +229,9 @@ export default {
                 }
             ];
         },
-        toggleAll () {
-            this.$parent.toggleAll();
+        selectAll () {
+            const status = !this.isSelectAll;
+            this.$parent.selectAll(status);
         },
         handleSort (column, type) {
             const state = this.columnsState[column.key];

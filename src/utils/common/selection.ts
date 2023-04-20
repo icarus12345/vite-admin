@@ -4,7 +4,7 @@ import { isObject } from "./typeof";
 
 export class Selection {
   public items: any[] = [];
-  changed: Subject<void> = new Subject();
+  changed: Subject<any> = new Subject();
   constructor(private multiple: boolean = true, initValue: any = []) {
     
   }
@@ -39,9 +39,8 @@ export class Selection {
       if (index === -1) {
         this.items.push(cloneDeep(item));
       }
-      return item.id;
     });
-    this.changed.next();
+    this.changed.next(this.items);
   }
 
   deselect(...items: any[]): void {
@@ -50,9 +49,8 @@ export class Selection {
       if (index >= 0) {
         this.items.splice(index, 1);
       }
-      return item.id;
     });
-    this.changed.next();
+    this.changed.next(this.items);
   }
 
   toggle(value: any): void {
@@ -61,7 +59,7 @@ export class Selection {
 
   clear(): void {
     this.items = [];
-    this.changed.next();
+    this.changed.next(this.items);
   }
 
   get selected(): any[] {

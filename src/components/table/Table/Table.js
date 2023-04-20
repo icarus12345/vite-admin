@@ -918,10 +918,8 @@ export default {
             }
             return data;
         },
-        toggleAll () {
-            // const ids = this.rebuildData
-        },
         selectAll (status) {
+            const checkedIds = LD.chain(this.getSelection()).map('id').value();
             // this.rebuildData.forEach((data) => {
             //     if(this.objData[data._index]._isDisabled){
             //         this.objData[data._index]._isChecked = false;
@@ -940,15 +938,26 @@ export default {
                 }
             }
             const selection = this.getSelection();
+            const ids = LD.chain(selection).map('id').value();
+            
             if (status) {
                 this.$emit('on-select-all', selection);
+                this.selection.select(...ids);
             } else {
+                this.selection.deselect(...checkedIds);
                 this.$emit('on-select-all-cancel', selection);
             }
+            console.log(selection,'selection')
             this.$emit('on-selection-change', selection);
         },
         selectAllChildren (data, status) {
             if (data.children && data.children.length) {
+                const ids = LD.chain(data.children).map('id').value();
+                if (status) {
+                    this.selection.select(...ids);
+                } else {
+                    this.selection.deselect(...ids);
+                }
                 data.children.map(item => {
                     if (!item._isDisabled) {
                         item._isChecked = status;
